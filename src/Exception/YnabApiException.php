@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Exception;
 
+use Throwable;
+
 final class YnabApiException extends YnabException
 {
 	public function __construct(
@@ -13,7 +15,7 @@ final class YnabApiException extends YnabException
 		public readonly ?string $errorId = null,
 		public readonly ?string $errorName = null,
 		public readonly ?string $errorDetail = null,
-		?\Throwable $previous = null,
+		?Throwable $previous = null,
 	) {
 		parent::__construct($message, $statusCode ?? 0, $previous);
 	}

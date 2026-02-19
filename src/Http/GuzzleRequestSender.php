@@ -6,6 +6,7 @@ namespace JPry\YNAB\Http;
 
 use GuzzleHttp\Client;
 use JPry\YNAB\Exception\YnabException;
+use Throwable;
 
 final class GuzzleRequestSender implements RequestSender
 {
@@ -43,7 +44,7 @@ final class GuzzleRequestSender implements RequestSender
 
 		try {
 			$response = $this->client->request($request->method, $request->url, $options);
-		} catch (\Throwable $e) {
+		} catch (Throwable $e) {
 			if (method_exists($e, 'hasResponse') && $e->hasResponse()) {
 				$response = $e->getResponse();
 				return new Response(

@@ -7,6 +7,7 @@ namespace JPry\YNAB\Tests\Fakes;
 use JPry\YNAB\Http\Request;
 use JPry\YNAB\Http\RequestSender;
 use JPry\YNAB\Http\Response;
+use RuntimeException;
 
 final class ArrayRequestSender implements RequestSender
 {
@@ -28,7 +29,7 @@ final class ArrayRequestSender implements RequestSender
 
 		$handler = array_shift($this->handlers);
 		if ($handler === null) {
-			throw new \RuntimeException("No fake handler available for request: {$request->method} {$request->url}");
+			throw new RuntimeException("No fake handler available for request: {$request->method} {$request->url}");
 		}
 
 		return $handler($request);

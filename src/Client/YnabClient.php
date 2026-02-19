@@ -12,6 +12,7 @@ use JPry\YNAB\Exception\YnabApiException;
 use JPry\YNAB\Exception\YnabException;
 use JPry\YNAB\Http\GuzzleRequestSender;
 use JPry\YNAB\Http\Request;
+use JPry\YNAB\Http\Response;
 use JPry\YNAB\Http\RequestSender;
 use JPry\YNAB\Internal\YnabErrorParser;
 use JPry\YNAB\Model\Account;
@@ -203,7 +204,7 @@ final class YnabClient
 		throw new YnabException('YNAB request failed after retry attempts.');
 	}
 
-	private function apiException(string $method, string $path, \JPry\YNAB\Http\Response $response): YnabApiException
+	private function apiException(string $method, string $path, Response $response): YnabApiException
 	{
 		$error = YnabErrorParser::parse($response->body);
 
