@@ -4,10 +4,10 @@
   "type": "library",
   "license": "MIT",
   "require": {
-    "php": "^8.2"
+    "php": "^8.3"
   },
   "require-dev": {
-    "pestphp/pest": "^3.0"
+    "pestphp/pest": "^4.0"
   },
   "suggest": {
     "guzzlehttp/guzzle": "Use the built-in Guzzle request sender"
