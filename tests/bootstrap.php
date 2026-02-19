@@ -9,6 +9,6 @@ if (is_file($autoload)) {
 	require_once $autoload;
 } else {
 	throw new RuntimeException(
-		'Could not find vendor/autoload.php. Run "composer install" in packages/jpry-ynab before running tests.',
+		'Could not find vendor/autoload.php. Run "composer install" before running tests.',
 	);
 }
