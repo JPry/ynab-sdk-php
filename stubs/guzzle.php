@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace GuzzleHttp;
 
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-
 class Client
 {
 	/** @param array<string,mixed> $config */
@@ -14,7 +11,8 @@ class Client
 	{
 	}
 
-	public function send(RequestInterface $request): ResponseInterface
+	/** @return mixed */
+	public function send($request)
 	{
 	}
 }
