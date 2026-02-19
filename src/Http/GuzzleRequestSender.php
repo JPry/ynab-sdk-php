@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace JPry\YNAB\Http;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use JPry\YNAB\Config\ClientConfig;
 use JPry\YNAB\Exception\YnabException;
-use Throwable;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 final class GuzzleRequestSender implements RequestSender
 {
@@ -24,60 +26,16 @@ final class GuzzleRequestSender implements RequestSender
 		$this->client = new Client([
 			'base_uri' => "{$normalizedBaseUrl}/",
 			'timeout' => $this->config->timeoutSeconds,
+			'http_errors' => false,
 		]);
 	}
 
-	public function send(Request $request): Response
+	public function sendRequest(RequestInterface $request): ResponseInterface
 	{
-		$options = [
-			'headers' => $request->headers,
-			'query' => $request->query,
-		];
-
-		if ($request->json !== null) {
-			$options['json'] = $request->json;
-		}
-
-		if ($request->form !== null) {
-			$options['form_params'] = $request->form;
-		}
-
 		try {
-			$response = $this->client->request($request->method, $request->url, $options);
-		} catch (Throwable $e) {
-			if (method_exists($e, 'hasResponse') && $e->hasResponse()) {
-				$response = $e->getResponse();
-				return new Response(
-					statusCode: (int) $response->getStatusCode(),
-					headers: $this->flattenHeaders((array) $response->getHeaders()),
-					body: (string) $response->getBody(),
-				);
-			}
-
+			return $this->client->send($request);
+		} catch (GuzzleException $e) {
 			throw new YnabException($e->getMessage() !== '' ? $e->getMessage() : 'HTTP request failed.', previous: $e);
 		}
-
-		return new Response(
-			statusCode: (int) $response->getStatusCode(),
-			headers: $this->flattenHeaders((array) $response->getHeaders()),
-			body: (string) $response->getBody(),
-		);
-	}
-
-	/**
-	 * @param array<string,array<int,string>> $headers
-	 * @return array<string,string>
-	 */
-	private function flattenHeaders(array $headers): array
-	{
-		$flat = [];
-		foreach ($headers as $name => $values) {
-			if (!is_string($name) || !is_array($values)) {
-				continue;
-			}
-			$flat[strtolower($name)] = implode(',', $values);
-		}
-
-		return $flat;
 	}
 }

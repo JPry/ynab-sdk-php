@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Http;
 
-interface RequestSender
+use Psr\Http\Client\ClientInterface;
+
+interface RequestSender extends ClientInterface
 {
-	public function send(Request $request): Response;
 }

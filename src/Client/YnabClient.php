@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Client;
 
+use GuzzleHttp\Psr7\Request;
 use JPry\YNAB\Auth\ApiKeyAuth;
 use JPry\YNAB\Auth\AuthMethod;
 use JPry\YNAB\Auth\OAuthTokenAuth;
@@ -11,8 +12,6 @@ use JPry\YNAB\Config\ClientConfig;
 use JPry\YNAB\Exception\YnabApiException;
 use JPry\YNAB\Exception\YnabException;
 use JPry\YNAB\Http\GuzzleRequestSender;
-use JPry\YNAB\Http\Request;
-use JPry\YNAB\Http\Response;
 use JPry\YNAB\Http\RequestSender;
 use JPry\YNAB\Internal\YnabErrorParser;
 use JPry\YNAB\Model\Account;
@@ -21,13 +20,14 @@ use JPry\YNAB\Model\Category;
 use JPry\YNAB\Model\Payee;
 use JPry\YNAB\Model\ResourceCollection;
 use JPry\YNAB\Model\Transaction;
+use Psr\Http\Message\ResponseInterface;
 
-final class YnabClient
+final readonly class YnabClient
 {
 	public function __construct(
-		private readonly RequestSender $requestSender,
-		private readonly AuthMethod $auth,
-		private readonly ClientConfig $config = new ClientConfig(),
+		private RequestSender $requestSender,
+		private AuthMethod $auth,
+		private ClientConfig $config = new ClientConfig(),
 	) {
 	}
 
@@ -164,33 +164,37 @@ final class YnabClient
 		$url = str_starts_with($path, 'http://') || str_starts_with($path, 'https://')
 			? $path
 			: "{$base}/{$route}";
+		$url = $this->appendQuery($url, $query);
 
 		$headers = $this->auth->apply([
 			'Accept' => 'application/json',
 		]);
+		$body = null;
+
+		if ($json !== null) {
+			$headers['Content-Type'] = 'application/json';
+			$body = json_encode($json, JSON_THROW_ON_ERROR);
+		}
 
 		$attempts = 0;
 
 		do {
 			$attempts++;
-			$response = $this->requestSender->send(new Request(
-				method: $method,
-				url: $url,
-				headers: $headers,
-				query: $query,
-				json: $json,
-			));
+			$response = $this->requestSender->sendRequest(new Request($method, $url, $headers, $body));
 
-			if ($response->statusCode === 401 && $this->auth instanceof OAuthTokenAuth && $attempts === 1) {
+			if ($response->getStatusCode() === 401 && $this->auth instanceof OAuthTokenAuth && $attempts === 1) {
 				$newToken = $this->auth->rotateToken();
 				if ($newToken !== null) {
 					$headers = $this->auth->apply(['Accept' => 'application/json']);
+					if ($json !== null) {
+						$headers['Content-Type'] = 'application/json';
+					}
 					continue;
 				}
 			}
 
-			if ($response->statusCode >= 200 && $response->statusCode < 300) {
-				$decoded = $response->json();
+			if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+				$decoded = json_decode((string) $response->getBody(), true);
 				if (!is_array($decoded['data'] ?? null)) {
 					throw new YnabException('Unexpected response format from YNAB API.');
 				}
@@ -204,13 +208,14 @@ final class YnabClient
 		throw new YnabException('YNAB request failed after retry attempts.');
 	}
 
-	private function apiException(string $method, string $path, Response $response): YnabApiException
+	private function apiException(string $method, string $path, ResponseInterface $response): YnabApiException
 	{
-		$error = YnabErrorParser::parse($response->body);
+		$error = YnabErrorParser::parse((string) $response->getBody());
 
 		$retryAfter = null;
-		if (is_numeric($response->headers['retry-after'] ?? null)) {
-			$retryAfter = (int) $response->headers['retry-after'];
+		$retryAfterHeader = $response->getHeaderLine('retry-after');
+		if ($retryAfterHeader !== '' && is_numeric($retryAfterHeader)) {
+			$retryAfter = (int) $retryAfterHeader;
 		}
 
 		$identifier = implode(' ', array_values(array_filter([
@@ -222,8 +227,8 @@ final class YnabClient
 		$detailSuffix = $error['detail'] !== null ? " {$error['detail']}" : '';
 
 		return new YnabApiException(
-			message: "YNAB API request failed ({$method} {$path}, HTTP {$response->statusCode}).{$idSuffix}{$detailSuffix}",
-			statusCode: $response->statusCode,
+			message: "YNAB API request failed ({$method} {$path}, HTTP {$response->getStatusCode()}).{$idSuffix}{$detailSuffix}",
+			statusCode: $response->getStatusCode(),
 			retryAfterSeconds: $retryAfter,
 			errorId: $error['id'],
 			errorName: $error['name'],
@@ -288,7 +293,7 @@ final class YnabClient
 	private function nextPageQuery(array $data): ?array
 	{
 		$nextPage = $data['next_page'] ?? null;
-		if ($nextPage !== null && (is_int($nextPage) || is_string($nextPage))) {
+		if (is_int($nextPage) || is_string($nextPage)) {
 			$value = trim((string) $nextPage);
 			if ($value !== '') {
 				return ['page' => $value];
@@ -330,5 +335,21 @@ final class YnabClient
 		}
 
 		return $normalized;
+	}
+
+	/** @param array<string,scalar|null> $query */
+	private function appendQuery(string $url, array $query): string
+	{
+		if ($query === []) {
+			return $url;
+		}
+
+		$encoded = http_build_query($query);
+		if ($encoded === '') {
+			return $url;
+		}
+
+		$separator = str_contains($url, '?') ? '&' : '?';
+		return "{$url}{$separator}{$encoded}";
 	}
 }

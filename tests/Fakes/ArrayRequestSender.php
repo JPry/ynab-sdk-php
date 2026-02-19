@@ -4,32 +4,32 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Tests\Fakes;
 
-use JPry\YNAB\Http\Request;
 use JPry\YNAB\Http\RequestSender;
-use JPry\YNAB\Http\Response;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 
 final class ArrayRequestSender implements RequestSender
 {
-	/** @var array<int,Request> */
+	/** @var array<int,RequestInterface> */
 	public array $requests = [];
 
-	/** @var list<callable(Request):Response> */
+	/** @var list<callable(RequestInterface):ResponseInterface> */
 	private array $handlers;
 
-	/** @param list<callable(Request):Response> $handlers */
+	/** @param list<callable(RequestInterface):ResponseInterface> $handlers */
 	public function __construct(array $handlers)
 	{
 		$this->handlers = $handlers;
 	}
 
-	public function send(Request $request): Response
+	public function sendRequest(RequestInterface $request): ResponseInterface
 	{
 		$this->requests[] = $request;
 
 		$handler = array_shift($this->handlers);
 		if ($handler === null) {
-			throw new RuntimeException("No fake handler available for request: {$request->method} {$request->url}");
+			throw new RuntimeException("No fake handler available for request: {$request->getMethod()} {$request->getUri()}");
 		}
 
 		return $handler($request);

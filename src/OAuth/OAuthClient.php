@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\OAuth;
 
+use GuzzleHttp\Psr7\Request;
 use JPry\YNAB\Exception\YnabException;
-use JPry\YNAB\Http\Request;
 use JPry\YNAB\Http\RequestSender;
 
 final readonly class OAuthClient
@@ -54,16 +54,23 @@ final readonly class OAuthClient
 	/** @param array<string,string> $form */
 	private function tokenRequest(array $form): OAuthTokens
 	{
-		$response = $this->requestSender->send(
+		$body = http_build_query($form);
+		$response = $this->requestSender->sendRequest(
 			new Request(
-				method: 'POST',
-				url: $this->config->tokenUrl,
-				headers: ['Accept' => 'application/json'],
-				form: $form,
+				'POST',
+				$this->config->tokenUrl,
+				[
+					'Accept' => 'application/json',
+					'Content-Type' => 'application/x-www-form-urlencoded',
+				],
+				$body,
 			),
 		);
 
-		$decoded = $response->json();
+		$decoded = json_decode((string) $response->getBody(), true);
+		if (!is_array($decoded)) {
+			$decoded = [];
+		}
 		$tokens = OAuthTokens::fromArray($decoded);
 
 		if ($tokens === null) {

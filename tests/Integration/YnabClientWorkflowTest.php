@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use JPry\YNAB\Client\YnabClient;
 use JPry\YNAB\Exception\YnabApiException;
-use JPry\YNAB\Http\Response;
 use JPry\YNAB\Tests\Fakes\ArrayRequestSender;
+use GuzzleHttp\Psr7\Response;
 
 it('supports api key auth and paginates transactions with next_page', function () {
 	$sender = new ArrayRequestSender([
@@ -23,8 +23,9 @@ it('supports api key auth and paginates transactions with next_page', function (
 	expect($transactions->items)->toHaveCount(2);
 	expect($transactions->serverKnowledge)->toBe(11);
 
-	expect($sender->requests[0]->headers['Authorization'] ?? null)->toBe('Bearer api-key-123');
-	expect($sender->requests[2]->query['page'] ?? null)->toBe('2');
+	expect($sender->requests[0]->getHeaderLine('Authorization'))->toBe('Bearer api-key-123');
+	parse_str($sender->requests[2]->getUri()->getQuery(), $query);
+	expect($query['page'] ?? null)->toBe('2');
 });
 
 it('refreshes oauth token on first unauthorized response', function () {

@@ -9,7 +9,7 @@ Framework-agnostic PHP library for the YNAB API.
 - Endpoint-by-name client methods (`budgets()`, `transactions()`, etc.)
 - Structured YNAB errors (`error.id`, `error.name`, `error.detail`)
 - Supports API key auth and OAuth token auth
-- Default request sender uses Guzzle, but any codebase can provide its own sender by implementing `JPry\\YNAB\\Http\\RequestSender`
+- Uses PSR-7/PSR-18 HTTP contracts; any codebase can provide its own sender by implementing `JPry\\YNAB\\Http\\RequestSender`
 
 ## Install
 
@@ -80,13 +80,14 @@ $tokens = $oauth->exchangeCodeForTokens('code-from-callback');
 ## Using your own HTTP client
 
 ```php
-use JPry\YNAB\Http\Request;
 use JPry\YNAB\Http\RequestSender;
-use JPry\YNAB\Http\Response;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Psr7\Response;
 
 final class MySender implements RequestSender
 {
-    public function send(Request $request): Response
+    public function sendRequest(RequestInterface $request): ResponseInterface
     {
         // Bridge to your own HTTP library
         return new Response(200, [], '{"data":{}}');
