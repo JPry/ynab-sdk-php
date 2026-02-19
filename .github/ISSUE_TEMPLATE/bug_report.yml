@@ -1,0 +1,58 @@
+name: Bug report
+description: Report a bug or regression in the package.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: Clear, minimal steps to reproduce.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: input
+    id: php_version
+    attributes:
+      label: PHP version
+      placeholder: "e.g. 8.4.2"
+    validations:
+      required: true
+
+  - type: input
+    id: package_version
+    attributes:
+      label: Package version
+      placeholder: "e.g. v0.1.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: code_sample
+    attributes:
+      label: Minimal code sample
+      description: Paste the smallest reproducible snippet.
+      render: php
+    validations:
+      required: true

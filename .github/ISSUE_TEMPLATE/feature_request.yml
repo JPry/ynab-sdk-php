@@ -1,0 +1,50 @@
+name: Feature request
+description: Propose an enhancement to the package API or behavior.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What user problem should this solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_api
+    attributes:
+      label: Proposed API or behavior
+      description: Show what you want the package API/usage to look like.
+      render: php
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What alternatives did you evaluate and why are they not sufficient?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: breaking_change
+    attributes:
+      label: Breaking change risk
+      options:
+        - None
+        - Low
+        - Medium
+        - High
+    validations:
+      required: true
+
+  - type: textarea
+    id: migration
+    attributes:
+      label: Migration notes (if breaking)
+      description: If this is breaking, what migration path should users follow?
+    validations:
+      required: false
