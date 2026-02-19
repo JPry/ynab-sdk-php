@@ -40,7 +40,7 @@ jobs:
           script: |
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            const bump = core.getInput('bump', { required: true });
+            const bump = context.payload.inputs?.bump ?? 'patch';
 
             const semverRegex = /^v(\d+)\.(\d+)\.(\d+)$/;
             const tagList = await github.paginate(github.rest.repos.listTags, {
