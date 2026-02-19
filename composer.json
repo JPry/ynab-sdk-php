@@ -1,5 +1,5 @@
 {
-  "name": "jpry/jpry-ynab-sdk-php",
+  "name": "jpry/ynab-sdk-php",
   "description": "Framework-agnostic YNAB API client for PHP",
   "type": "library",
   "license": "MIT",

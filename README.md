@@ -2,7 +2,7 @@
 
 Framework-agnostic PHP library for the YNAB API.
 
-Repository: [jpry/jpry-ynab-sdk-php](https://github.com/JPry/jpry-ynab-sdk-php)
+Repository: [jpry/ynab-sdk-php](https://github.com/JPry/ynab-sdk-php)
 
 ## Highlights
 
@@ -16,7 +16,7 @@ Repository: [jpry/jpry-ynab-sdk-php](https://github.com/JPry/jpry-ynab-sdk-php)
 ## Install
 
 ```bash
-composer require jpry/jpry-ynab-sdk-php
+composer require jpry/ynab-sdk-php
 ```
 
 If you want the built-in default sender:
