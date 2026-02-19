@@ -1,0 +1,26 @@
+<?php
+
+declare(strict_types=1);
+
+namespace GuzzleHttp;
+
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+
+class Client
+{
+	/** @param array<string,mixed> $config */
+	public function __construct(array $config = [])
+	{
+	}
+
+	public function send(RequestInterface $request): ResponseInterface
+	{
+	}
+}
+
+namespace GuzzleHttp\Exception;
+
+interface GuzzleException extends \Throwable
+{
+}
