@@ -1,0 +1,59 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  tests:
+    name: Pest Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run Pest
+        run: ./vendor/bin/pest --compact
+
+  style:
+    name: Code Style (PR Files)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: php-cs-fixer
+
+      - name: Get changed PHP files
+        id: changed-php
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            **/*.php
+
+      - name: Check style for changed PHP files
+        if: steps.changed-php.outputs.any_changed == 'true'
+        run: php-cs-fixer fix --dry-run --diff --verbose --path-mode=intersection ${{ steps.changed-php.outputs.all_changed_files }}
+
+      - name: Skip style check when no PHP files changed
+        if: steps.changed-php.outputs.any_changed != 'true'
+        run: echo "No changed PHP files in this PR."
