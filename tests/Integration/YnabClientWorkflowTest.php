@@ -128,3 +128,23 @@ it('keeps budget-named methods and emits deprecation warnings', function () {
 	expect($joinedWarnings)->toContain('budgets() is deprecated');
 	expect($joinedWarnings)->toContain('defaultBudget() is deprecated');
 });
+
+it('retrieves user and plan settings', function () {
+	$sender = new ArrayRequestSender([
+		fn ($request) => new Response(200, [], '{"data":{"user":{"id":"U1"}}}'),
+		fn ($request) => new Response(200, [], '{"data":{"settings":{"date_format":{"format":"YYYY-MM-DD"},"currency_format":{"iso_code":"USD","example_format":"$12,345.67","decimal_digits":2,"decimal_separator":".","symbol_first":true,"group_separator":",","currency_symbol":"$","display_symbol":true}}}}'),
+	]);
+
+	$client = YnabClient::withApiKey('api-key-123', requestSender: $sender);
+
+	$user = $client->user();
+	$settings = $client->planSettings('P1');
+
+	expect($user?->id)->toBe('U1');
+	expect($settings?->dateFormat)->toBe('YYYY-MM-DD');
+	expect($settings?->currencyIsoCode)->toBe('USD');
+	expect($settings?->currencySymbol)->toBe('$');
+
+	expect($sender->requests[0]->getUri()->getPath())->toEndWith('/user');
+	expect($sender->requests[1]->getUri()->getPath())->toEndWith('/plans/P1/settings');
+});

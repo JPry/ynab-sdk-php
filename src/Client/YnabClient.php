@@ -20,8 +20,10 @@ use JPry\YNAB\Model\Budget;
 use JPry\YNAB\Model\Category;
 use JPry\YNAB\Model\Payee;
 use JPry\YNAB\Model\Plan;
+use JPry\YNAB\Model\PlanSettings;
 use JPry\YNAB\Model\ResourceCollection;
 use JPry\YNAB\Model\Transaction;
+use JPry\YNAB\Model\User;
 use Psr\Http\Message\ResponseInterface;
 
 final readonly class YnabClient
@@ -88,6 +90,18 @@ final readonly class YnabClient
 		$default = $this->firstArrayByKeys($data, ['plan', 'budget']);
 
 		return $default === null ? null : Plan::fromArray($default);
+	}
+
+	public function user(): ?User
+	{
+		$data = $this->get('/user');
+		return is_array($data['user'] ?? null) ? User::fromArray($data['user']) : null;
+	}
+
+	public function planSettings(string $planId): ?PlanSettings
+	{
+		$data = $this->get("/plans/{$planId}/settings");
+		return is_array($data['settings'] ?? null) ? PlanSettings::fromArray($data['settings']) : null;
 	}
 
 	/** @return ResourceCollection<Account> */
