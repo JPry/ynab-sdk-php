@@ -252,3 +252,22 @@ it('supports additional plan-scoped read endpoints from the openapi audit', func
 	expect($sender->requests[8]->getUri()->getPath())->toEndWith('/plans/P1/payees/PY1/transactions');
 	expect($sender->requests[9]->getUri()->getPath())->toEndWith('/plans/P1/months/2026-03-01/transactions');
 });
+
+it('retrieves category details for current and explicit month contexts', function () {
+	$sender = new ArrayRequestSender([
+		fn ($request) => new Response(200, [], '{"data":{"category":{"id":"C1","category_group_id":"CG1","category_group_name":"Essentials","name":"Groceries","budgeted":25000,"activity":-12000,"balance":13000,"hidden":false,"deleted":false}}}'),
+		fn ($request) => new Response(200, [], '{"data":{"category":{"id":"C1","category_group_id":"CG1","category_group_name":"Essentials","name":"Groceries","budgeted":26000,"activity":-10000,"balance":16000,"hidden":false,"deleted":false}}}'),
+	]);
+
+	$client = YnabClient::withApiKey('api-key-123', requestSender: $sender);
+
+	$category = $client->category('P1', 'C1');
+	$monthCategory = $client->monthCategory('P1', '2026-03-01', 'C1');
+
+	expect($category?->id)->toBe('C1');
+	expect($category?->budgeted)->toBe(25000);
+	expect($monthCategory?->budgeted)->toBe(26000);
+
+	expect($sender->requests[0]->getUri()->getPath())->toEndWith('/plans/P1/categories/C1');
+	expect($sender->requests[1]->getUri()->getPath())->toEndWith('/plans/P1/months/2026-03-01/categories/C1');
+});

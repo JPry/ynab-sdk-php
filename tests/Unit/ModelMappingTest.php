@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use JPry\YNAB\Model\Budget;
+use JPry\YNAB\Model\CategoryDetail;
 use JPry\YNAB\Model\CategoryGroup;
 use JPry\YNAB\Model\MoneyMovement;
 use JPry\YNAB\Model\MoneyMovementGroup;
@@ -186,4 +187,24 @@ it('maps category group rows into typed objects', function () {
 	expect($group)->not->toBeNull();
 	expect($group?->id)->toBe('CG1');
 	expect($group?->name)->toBe('Essentials');
+});
+
+it('maps category detail rows into typed objects', function () {
+	$category = CategoryDetail::fromArray([
+		'id' => 'C1',
+		'category_group_id' => 'CG1',
+		'category_group_name' => 'Essentials',
+		'name' => 'Groceries',
+		'note' => 'Food',
+		'budgeted' => 25000,
+		'activity' => -12000,
+		'balance' => 13000,
+		'hidden' => false,
+		'deleted' => false,
+	]);
+
+	expect($category)->not->toBeNull();
+	expect($category?->id)->toBe('C1');
+	expect($category?->categoryGroupId)->toBe('CG1');
+	expect($category?->budgeted)->toBe(25000);
 });

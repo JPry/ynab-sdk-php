@@ -18,6 +18,7 @@ use JPry\YNAB\Internal\YnabErrorParser;
 use JPry\YNAB\Model\Account;
 use JPry\YNAB\Model\Budget;
 use JPry\YNAB\Model\Category;
+use JPry\YNAB\Model\CategoryDetail;
 use JPry\YNAB\Model\CategoryGroup;
 use JPry\YNAB\Model\Month;
 use JPry\YNAB\Model\MoneyMovement;
@@ -294,6 +295,16 @@ final readonly class YnabClient
 		}
 
 		return new ResourceCollection($items, $serverKnowledge);
+	}
+
+	public function category(string $planId, string $categoryId): ?CategoryDetail
+	{
+		return $this->item("/plans/{$planId}/categories/{$categoryId}", [], 'category', static fn (array $row): ?CategoryDetail => CategoryDetail::fromArray($row));
+	}
+
+	public function monthCategory(string $planId, string $month, string $categoryId): ?CategoryDetail
+	{
+		return $this->item("/plans/{$planId}/months/{$month}/categories/{$categoryId}", [], 'category', static fn (array $row): ?CategoryDetail => CategoryDetail::fromArray($row));
 	}
 
 	/** @return ResourceCollection<Payee> */
