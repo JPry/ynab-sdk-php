@@ -54,6 +54,37 @@ $transactions = $client->transactions('plan-id', ['since_date' => '2026-01-01'])
 
 Legacy budget-named APIs (`budgets()`, `defaultBudget()`, and `JPry\\YNAB\\Model\\Budget`) remain available for backward compatibility but are deprecated and emit `E_USER_DEPRECATED` warnings.
 
+Most mutating methods (create/update/delete) return the raw `data` payload from the API response as `array<string,mixed>`.
+Mutating methods also accept typed request models in `JPry\\YNAB\\Model\\Mutation\\*` (legacy array and string-id signatures remain supported).
+
+```php
+use JPry\YNAB\Model\Mutation\CreateTransactionsRequest;
+use JPry\YNAB\Model\Mutation\TransactionPayload;
+use JPry\YNAB\Model\Mutation\UpdateTransactionRequest;
+
+$client->createTransactions(
+    'plan-id',
+    CreateTransactionsRequest::single(
+        new TransactionPayload(accountId: 'account-id', amount: -1000)
+    ),
+);
+
+$client->updateTransaction(
+    'plan-id',
+    new UpdateTransactionRequest('transaction-id', new TransactionPayload(memo: 'Updated memo')),
+);
+```
+
+## Documentation
+
+- [Documentation Index](./docs/README.md)
+- [Getting Started](./docs/getting-started.md)
+- [API Usage](./docs/api-usage.md)
+- [Mutations and Request Models](./docs/mutations.md)
+- [OAuth Flow](./docs/oauth-flow.md)
+- [Migration Notes: Budgets to Plans](./docs/migration-plans.md)
+- [OpenAPI Spec Snapshot](./openapi/README.md)
+
 ### OAuth token
 
 ```php

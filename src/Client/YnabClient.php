@@ -21,6 +21,20 @@ use JPry\YNAB\Model\Category;
 use JPry\YNAB\Model\CategoryDetail;
 use JPry\YNAB\Model\CategoryGroup;
 use JPry\YNAB\Model\Month;
+use JPry\YNAB\Model\Mutation\CreateAccountRequest;
+use JPry\YNAB\Model\Mutation\CreateCategoryGroupRequest;
+use JPry\YNAB\Model\Mutation\CreateCategoryRequest;
+use JPry\YNAB\Model\Mutation\CreateScheduledTransactionRequest;
+use JPry\YNAB\Model\Mutation\CreateTransactionsRequest;
+use JPry\YNAB\Model\Mutation\ImportTransactionsRequest;
+use JPry\YNAB\Model\Mutation\PatchTransactionsRequest;
+use JPry\YNAB\Model\Mutation\RequestModel;
+use JPry\YNAB\Model\Mutation\UpdateCategoryGroupRequest;
+use JPry\YNAB\Model\Mutation\UpdateCategoryRequest;
+use JPry\YNAB\Model\Mutation\UpdateMonthCategoryRequest;
+use JPry\YNAB\Model\Mutation\UpdatePayeeRequest;
+use JPry\YNAB\Model\Mutation\UpdateScheduledTransactionRequest;
+use JPry\YNAB\Model\Mutation\UpdateTransactionRequest;
 use JPry\YNAB\Model\MoneyMovement;
 use JPry\YNAB\Model\MoneyMovementGroup;
 use JPry\YNAB\Model\Payee;
@@ -324,14 +338,248 @@ final readonly class YnabClient
 	}
 
 	/**
-	 * @param array<string,mixed> $payload
+	 * @param array<string,mixed>|PatchTransactionsRequest $payload
 	 * @return array<string,mixed>
 	 */
-	public function patchTransactions(string $budgetId, array $payload): array
+	public function patchTransactions(string $budgetId, array|PatchTransactionsRequest $payload): array
 	{
 		$planId = $budgetId;
 
-		return $this->request('PATCH', "/plans/{$planId}/transactions", [], $payload);
+		return $this->request('PATCH', "/plans/{$planId}/transactions", [], $this->payloadToArray($payload));
+	}
+
+	/**
+	 * @param array<string,mixed>|CreateTransactionsRequest $payload
+	 * @return array<string,mixed>
+	 */
+	public function createTransactions(string $planId, array|CreateTransactionsRequest $payload): array
+	{
+		return $this->request('POST', "/plans/{$planId}/transactions", [], $this->payloadToArray($payload));
+	}
+
+	/**
+	 * @param null|array<string,mixed>|ImportTransactionsRequest $payload
+	 * @return array<string,mixed>
+	 */
+	public function importTransactions(string $planId, array|ImportTransactionsRequest|null $payload = null): array
+	{
+		return $this->request('POST', "/plans/{$planId}/transactions/import", [], $payload === null ? null : $this->payloadToArray($payload));
+	}
+
+	/**
+	 * @param UpdateTransactionRequest|string $transactionId
+	 * @param null|array<string,mixed> $payload
+	 * @return array<string,mixed>
+	 */
+	public function updateTransaction(string $planId, UpdateTransactionRequest|string $transactionId, ?array $payload = null): array
+	{
+		if ($transactionId instanceof UpdateTransactionRequest) {
+			if ($payload !== null) {
+				throw new YnabException('When passing UpdateTransactionRequest, omit the $payload argument.');
+			}
+
+			return $this->request(
+				'PUT',
+				"/plans/{$planId}/transactions/{$this->resolveModelId($transactionId)}",
+				[],
+				$transactionId->toArray(),
+			);
+		}
+
+		if ($payload === null) {
+			throw new YnabException('updateTransaction() requires $payload when $transactionId is a string.');
+		}
+
+		return $this->request('PUT', "/plans/{$planId}/transactions/{$transactionId}", [], $payload);
+	}
+
+	/**
+	 * @param string|Transaction|UpdateTransactionRequest $transactionId
+	 * @return array<string,mixed>
+	 */
+	public function deleteTransaction(string $planId, string|Transaction|UpdateTransactionRequest $transactionId): array
+	{
+		return $this->request('DELETE', "/plans/{$planId}/transactions/{$this->resolveModelId($transactionId)}", [], null);
+	}
+
+	/**
+	 * @param array<string,mixed>|CreateScheduledTransactionRequest $payload
+	 * @return array<string,mixed>
+	 */
+	public function createScheduledTransaction(string $planId, array|CreateScheduledTransactionRequest $payload): array
+	{
+		return $this->request('POST', "/plans/{$planId}/scheduled_transactions", [], $this->payloadToArray($payload));
+	}
+
+	/**
+	 * @param UpdateScheduledTransactionRequest|string $scheduledTransactionId
+	 * @param null|array<string,mixed> $payload
+	 * @return array<string,mixed>
+	 */
+	public function updateScheduledTransaction(string $planId, UpdateScheduledTransactionRequest|string $scheduledTransactionId, ?array $payload = null): array
+	{
+		if ($scheduledTransactionId instanceof UpdateScheduledTransactionRequest) {
+			if ($payload !== null) {
+				throw new YnabException('When passing UpdateScheduledTransactionRequest, omit the $payload argument.');
+			}
+
+			return $this->request(
+				'PUT',
+				"/plans/{$planId}/scheduled_transactions/{$this->resolveModelId($scheduledTransactionId)}",
+				[],
+				$scheduledTransactionId->toArray(),
+			);
+		}
+
+		if ($payload === null) {
+			throw new YnabException('updateScheduledTransaction() requires $payload when $scheduledTransactionId is a string.');
+		}
+
+		return $this->request('PUT', "/plans/{$planId}/scheduled_transactions/{$scheduledTransactionId}", [], $payload);
+	}
+
+	/**
+	 * @param string|ScheduledTransaction|UpdateScheduledTransactionRequest $scheduledTransactionId
+	 * @return array<string,mixed>
+	 */
+	public function deleteScheduledTransaction(string $planId, string|ScheduledTransaction|UpdateScheduledTransactionRequest $scheduledTransactionId): array
+	{
+		return $this->request('DELETE', "/plans/{$planId}/scheduled_transactions/{$this->resolveModelId($scheduledTransactionId)}", [], null);
+	}
+
+	/**
+	 * @param array<string,mixed>|CreateAccountRequest $payload
+	 * @return array<string,mixed>
+	 */
+	public function createAccount(string $planId, array|CreateAccountRequest $payload): array
+	{
+		return $this->request('POST', "/plans/{$planId}/accounts", [], $this->payloadToArray($payload));
+	}
+
+	/**
+	 * @param array<string,mixed>|CreateCategoryRequest $payload
+	 * @return array<string,mixed>
+	 */
+	public function createCategory(string $planId, array|CreateCategoryRequest $payload): array
+	{
+		return $this->request('POST', "/plans/{$planId}/categories", [], $this->payloadToArray($payload));
+	}
+
+	/**
+	 * @param UpdateCategoryRequest|string $categoryId
+	 * @param null|array<string,mixed> $payload
+	 * @return array<string,mixed>
+	 */
+	public function updateCategory(string $planId, UpdateCategoryRequest|string $categoryId, ?array $payload = null): array
+	{
+		if ($categoryId instanceof UpdateCategoryRequest) {
+			if ($payload !== null) {
+				throw new YnabException('When passing UpdateCategoryRequest, omit the $payload argument.');
+			}
+
+			return $this->request(
+				'PATCH',
+				"/plans/{$planId}/categories/{$this->resolveModelId($categoryId)}",
+				[],
+				$categoryId->toArray(),
+			);
+		}
+
+		if ($payload === null) {
+			throw new YnabException('updateCategory() requires $payload when $categoryId is a string.');
+		}
+
+		return $this->request('PATCH', "/plans/{$planId}/categories/{$categoryId}", [], $payload);
+	}
+
+	/**
+	 * @param UpdateMonthCategoryRequest|string $categoryId
+	 * @param null|array<string,mixed> $payload
+	 * @return array<string,mixed>
+	 */
+	public function updateMonthCategory(string $planId, string $month, UpdateMonthCategoryRequest|string $categoryId, ?array $payload = null): array
+	{
+		if ($categoryId instanceof UpdateMonthCategoryRequest) {
+			if ($payload !== null) {
+				throw new YnabException('When passing UpdateMonthCategoryRequest, omit the $payload argument.');
+			}
+
+			return $this->request(
+				'PATCH',
+				"/plans/{$planId}/months/{$month}/categories/{$this->resolveModelId($categoryId)}",
+				[],
+				$categoryId->toArray(),
+			);
+		}
+
+		if ($payload === null) {
+			throw new YnabException('updateMonthCategory() requires $payload when $categoryId is a string.');
+		}
+
+		return $this->request('PATCH', "/plans/{$planId}/months/{$month}/categories/{$categoryId}", [], $payload);
+	}
+
+	/**
+	 * @param array<string,mixed>|CreateCategoryGroupRequest $payload
+	 * @return array<string,mixed>
+	 */
+	public function createCategoryGroup(string $planId, array|CreateCategoryGroupRequest $payload): array
+	{
+		return $this->request('POST', "/plans/{$planId}/category_groups", [], $this->payloadToArray($payload));
+	}
+
+	/**
+	 * @param UpdateCategoryGroupRequest|string $categoryGroupId
+	 * @param null|array<string,mixed> $payload
+	 * @return array<string,mixed>
+	 */
+	public function updateCategoryGroup(string $planId, UpdateCategoryGroupRequest|string $categoryGroupId, ?array $payload = null): array
+	{
+		if ($categoryGroupId instanceof UpdateCategoryGroupRequest) {
+			if ($payload !== null) {
+				throw new YnabException('When passing UpdateCategoryGroupRequest, omit the $payload argument.');
+			}
+
+			return $this->request(
+				'PATCH',
+				"/plans/{$planId}/category_groups/{$this->resolveModelId($categoryGroupId)}",
+				[],
+				$categoryGroupId->toArray(),
+			);
+		}
+
+		if ($payload === null) {
+			throw new YnabException('updateCategoryGroup() requires $payload when $categoryGroupId is a string.');
+		}
+
+		return $this->request('PATCH', "/plans/{$planId}/category_groups/{$categoryGroupId}", [], $payload);
+	}
+
+	/**
+	 * @param UpdatePayeeRequest|string $payeeId
+	 * @param null|array<string,mixed> $payload
+	 * @return array<string,mixed>
+	 */
+	public function updatePayee(string $planId, UpdatePayeeRequest|string $payeeId, ?array $payload = null): array
+	{
+		if ($payeeId instanceof UpdatePayeeRequest) {
+			if ($payload !== null) {
+				throw new YnabException('When passing UpdatePayeeRequest, omit the $payload argument.');
+			}
+
+			return $this->request(
+				'PATCH',
+				"/plans/{$planId}/payees/{$this->resolveModelId($payeeId)}",
+				[],
+				$payeeId->toArray(),
+			);
+		}
+
+		if ($payload === null) {
+			throw new YnabException('updatePayee() requires $payload when $payeeId is a string.');
+		}
+
+		return $this->request('PATCH', "/plans/{$planId}/payees/{$payeeId}", [], $payload);
 	}
 
 	/**
@@ -340,6 +588,33 @@ final readonly class YnabClient
 	private function get(string $path, array $query = []): array
 	{
 		return $this->request('GET', $path, $query, null);
+	}
+
+	/**
+	 * @param array<string,mixed>|RequestModel $payload
+	 * @return array<string,mixed>
+	 */
+	private function payloadToArray(array|RequestModel $payload): array
+	{
+		return is_array($payload) ? $payload : $payload->toArray();
+	}
+
+	/**
+	 * @param object{id:string}|string $idCarrier
+	 */
+	private function resolveModelId(string|object $idCarrier): string
+	{
+		$id = is_string($idCarrier) ? $idCarrier : ($idCarrier->id ?? null);
+		if (!is_string($id)) {
+			throw new YnabException('Expected a string ID or model instance with a string $id property.');
+		}
+
+		$id = trim($id);
+		if ($id === '') {
+			throw new YnabException('Model ID cannot be empty.');
+		}
+
+		return $id;
 	}
 
 	/**
