@@ -29,13 +29,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Calculate next version and generate changelog
         id: release-meta
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const owner = context.repo.owner;
@@ -191,11 +191,24 @@ jobs:
           echo "Publish now: ${{ inputs.publish }}"
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.release-meta.outputs.next_tag }}
-          name: ${{ steps.release-meta.outputs.next_tag }}
-          body_path: ${{ steps.release-meta.outputs.notes_path }}
-          draft: ${{ !inputs.publish }}
-          prerelease: false
-          target_commitish: ${{ github.sha }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ steps.release-meta.outputs.next_tag }}
+          NOTES_PATH: ${{ steps.release-meta.outputs.notes_path }}
+          TARGET_SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+          DRAFT: ${{ !inputs.publish }}
+        run: |
+          args=(
+            "$TAG_NAME"
+            --repo "$REPO"
+            --title "$TAG_NAME"
+            --notes-file "$NOTES_PATH"
+            --target "$TARGET_SHA"
+          )
+
+          if [[ "$DRAFT" == "true" ]]; then
+            args+=(--draft)
+          fi
+
+          gh release create "${args[@]}"
