@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model;
 
+use JPry\YNAB\Internal\BudgetDeprecationWarningTrait;
+
 /**
  * @deprecated YNAB API v1.79.0 renamed budgets to plans. Use Plan instead.
  */
 final readonly class Budget
 {
+	use BudgetDeprecationWarningTrait;
+
 	public function __construct(
 		public string $id,
 		public string $name,
 	) {
-		$this->warnDeprecation();
+		$this->warnBudgetDeprecation(self::class, Plan::class);
 	}
 
 	/** @param array<string,mixed> $row */
@@ -27,14 +31,6 @@ final readonly class Budget
 		return new self(
 			id: $id,
 			name: (string) ($row['name'] ?? 'Unnamed'),
-		);
-	}
-
-	private function warnDeprecation(): void
-	{
-		trigger_error(
-			'JPry\\YNAB\\Model\\Budget is deprecated and will be removed in a future release. Use JPry\\YNAB\\Model\\Plan.',
-			E_USER_DEPRECATED,
 		);
 	}
 }

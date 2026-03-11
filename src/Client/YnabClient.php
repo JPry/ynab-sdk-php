@@ -13,6 +13,7 @@ use JPry\YNAB\Exception\YnabApiException;
 use JPry\YNAB\Exception\YnabException;
 use JPry\YNAB\Http\GuzzleRequestSender;
 use JPry\YNAB\Http\RequestSender;
+use JPry\YNAB\Internal\BudgetDeprecationWarningTrait;
 use JPry\YNAB\Internal\YnabErrorParser;
 use JPry\YNAB\Model\Account;
 use JPry\YNAB\Model\Budget;
@@ -25,6 +26,8 @@ use Psr\Http\Message\ResponseInterface;
 
 final readonly class YnabClient
 {
+	use BudgetDeprecationWarningTrait;
+
 	public function __construct(
 		private RequestSender $requestSender,
 		private AuthMethod $auth,
@@ -326,21 +329,6 @@ final readonly class YnabClient
 		}
 
 		return null;
-	}
-
-	private function warnBudgetDeprecation(string $oldUsage, string $newUsage): void
-	{
-		static $warned = [];
-		if (isset($warned[$oldUsage])) {
-			return;
-		}
-
-		$warned[$oldUsage] = true;
-
-		trigger_error(
-			"{$oldUsage} is deprecated and will be removed in a future release. Use {$newUsage}.",
-			E_USER_DEPRECATED,
-		);
 	}
 
 	/** @param array<string,mixed> $data */
