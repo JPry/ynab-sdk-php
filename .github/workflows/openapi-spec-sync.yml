@@ -1,0 +1,47 @@
+name: OpenAPI Spec Sync
+
+on:
+  schedule:
+    - cron: '0 13 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-openapi:
+    name: Sync OpenAPI spec snapshot
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sync spec
+        run: ./scripts/sync-openapi-spec.sh
+
+      - name: Detect changes
+        id: diff
+        run: |
+          if git diff --quiet -- openapi/ynab-v1.openapi.yaml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create pull request
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: codex/openapi-spec-sync
+          delete-branch: true
+          commit-message: "chore: sync OpenAPI spec snapshot"
+          title: "chore: sync OpenAPI spec snapshot"
+          body: |
+            Automated update of the local YNAB OpenAPI spec snapshot.
+
+            Source: https://api.ynab.com/papi/open_api_spec.yaml
+            Script: ./scripts/sync-openapi-spec.sh
+          labels: |
+            chore

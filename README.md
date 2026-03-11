@@ -109,6 +109,13 @@ $client = YnabClient::withApiKey('api-key', requestSender: new MySender());
 
 Collection methods automatically follow pagination metadata when present (`next_page`, `next_page_url`, or `links.next`).
 
+## OpenAPI spec
+
+The repository includes a local snapshot of the YNAB OpenAPI specification at `openapi/ynab-v1.openapi.yaml`.
+
+- Sync manually: `./scripts/sync-openapi-spec.sh`
+- Automated sync: `.github/workflows/openapi-spec-sync.yml` (weekly + manual dispatch)
+
 ## Tests
 
 ```bash
