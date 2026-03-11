@@ -7,8 +7,8 @@ Repository: [jpry/ynab-sdk-php](https://github.com/JPry/ynab-sdk-php)
 ## Highlights
 
 - Namespace root: `JPry\\YNAB\\`
-- Typed resources for users, plans, plan settings, accounts, categories, payees, and transactions
-- Endpoint-by-name client methods (`user()`, `plans()`, `planSettings()`, `transactions()`, etc.)
+- Typed resources for users, plans, plan settings, accounts, categories, category groups, payees, payee locations, months, money movements, scheduled transactions, and transactions
+- Endpoint-by-name client methods (`user()`, `plans()`, `planSettings()`, `months()`, `moneyMovements()`, `scheduledTransactions()`, etc.)
 - Structured YNAB errors (`error.id`, `error.name`, `error.detail`)
 - Supports API key auth and OAuth token auth
 - Uses PSR-7/PSR-18 HTTP contracts; any codebase can provide its own sender by implementing `JPry\\YNAB\\Http\\RequestSender`
@@ -43,6 +43,10 @@ $client = YnabClient::withApiKey('your-api-key', config: $config);
 $user = $client->user();
 $plans = $client->plans();
 $settings = $client->planSettings('plan-id');
+$months = $client->months('plan-id');
+$moneyMovements = $client->moneyMovements('plan-id');
+$scheduled = $client->scheduledTransactions('plan-id');
+$payeeLocations = $client->payeeLocations('plan-id');
 $transactions = $client->transactions('plan-id', ['since_date' => '2026-01-01']);
 ```
 

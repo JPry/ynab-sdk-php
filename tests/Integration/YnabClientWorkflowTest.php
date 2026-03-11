@@ -148,3 +148,107 @@ it('retrieves user and plan settings', function () {
 	expect($sender->requests[0]->getUri()->getPath())->toEndWith('/user');
 	expect($sender->requests[1]->getUri()->getPath())->toEndWith('/plans/P1/settings');
 });
+
+it('supports months, money movements, scheduled transactions, and payee locations', function () {
+	$sender = new ArrayRequestSender([
+		fn ($request) => new Response(200, [], '{"data":{"months":[{"month":"2026-03-01","income":100000,"budgeted":60000,"activity":-25000,"to_be_budgeted":40000,"deleted":false}],"server_knowledge":1}}'),
+		fn ($request) => new Response(200, [], '{"data":{"month":{"month":"2026-03-01","income":100000,"budgeted":60000,"activity":-25000,"to_be_budgeted":40000,"deleted":false}}}'),
+		fn ($request) => new Response(200, [], '{"data":{"money_movements":[{"id":"MM1","amount":12000}],"server_knowledge":2}}'),
+		fn ($request) => new Response(200, [], '{"data":{"money_movements":[{"id":"MM2","amount":5000}],"server_knowledge":3}}'),
+		fn ($request) => new Response(200, [], '{"data":{"money_movement_groups":[{"id":"MMG1","group_created_at":"2026-03-10T12:00:00Z","month":"2026-03-01"}],"server_knowledge":4}}'),
+		fn ($request) => new Response(200, [], '{"data":{"money_movement_groups":[{"id":"MMG2","group_created_at":"2026-03-10T13:00:00Z","month":"2026-03-01"}],"server_knowledge":5}}'),
+		fn ($request) => new Response(200, [], '{"data":{"scheduled_transactions":[{"id":"ST1","account_id":"A1","date_first":"2026-03-01","date_next":"2026-04-01","frequency":"monthly","amount":-1000,"deleted":false}],"server_knowledge":6}}'),
+		fn ($request) => new Response(200, [], '{"data":{"scheduled_transaction":{"id":"ST1","account_id":"A1","date_first":"2026-03-01","date_next":"2026-04-01","frequency":"monthly","amount":-1000,"deleted":false}}}'),
+		fn ($request) => new Response(200, [], '{"data":{"payee_locations":[{"id":"PL1","payee_id":"PY1","latitude":"41.8781","longitude":"-87.6298","deleted":false}]}}'),
+		fn ($request) => new Response(200, [], '{"data":{"payee_location":{"id":"PL1","payee_id":"PY1","latitude":"41.8781","longitude":"-87.6298","deleted":false}}}'),
+		fn ($request) => new Response(200, [], '{"data":{"payee_locations":[{"id":"PL2","payee_id":"PY1","latitude":"41.8810","longitude":"-87.6200","deleted":false}]}}'),
+	]);
+
+	$client = YnabClient::withApiKey('api-key-123', requestSender: $sender);
+
+	$months = $client->months('P1');
+	$month = $client->month('P1', '2026-03-01');
+	$moneyMovements = $client->moneyMovements('P1');
+	$moneyMovementsByMonth = $client->moneyMovementsByMonth('P1', '2026-03-01');
+	$movementGroups = $client->moneyMovementGroups('P1');
+	$movementGroupsByMonth = $client->moneyMovementGroupsByMonth('P1', '2026-03-01');
+	$scheduled = $client->scheduledTransactions('P1');
+	$scheduledOne = $client->scheduledTransaction('P1', 'ST1');
+	$locations = $client->payeeLocations('P1');
+	$location = $client->payeeLocation('P1', 'PL1');
+	$locationsByPayee = $client->payeeLocationsByPayee('P1', 'PY1');
+
+	expect($months->items)->toHaveCount(1);
+	expect($month?->month)->toBe('2026-03-01');
+	expect($moneyMovements->items)->toHaveCount(1);
+	expect($moneyMovementsByMonth->items)->toHaveCount(1);
+	expect($movementGroups->items)->toHaveCount(1);
+	expect($movementGroupsByMonth->items)->toHaveCount(1);
+	expect($scheduled->items)->toHaveCount(1);
+	expect($scheduledOne?->id)->toBe('ST1');
+	expect($locations->items)->toHaveCount(1);
+	expect($location?->id)->toBe('PL1');
+	expect($locationsByPayee->items)->toHaveCount(1);
+
+	expect($sender->requests[0]->getUri()->getPath())->toEndWith('/plans/P1/months');
+	expect($sender->requests[1]->getUri()->getPath())->toEndWith('/plans/P1/months/2026-03-01');
+	expect($sender->requests[2]->getUri()->getPath())->toEndWith('/plans/P1/money_movements');
+	expect($sender->requests[3]->getUri()->getPath())->toEndWith('/plans/P1/months/2026-03-01/money_movements');
+	expect($sender->requests[4]->getUri()->getPath())->toEndWith('/plans/P1/money_movement_groups');
+	expect($sender->requests[5]->getUri()->getPath())->toEndWith('/plans/P1/months/2026-03-01/money_movement_groups');
+	expect($sender->requests[6]->getUri()->getPath())->toEndWith('/plans/P1/scheduled_transactions');
+	expect($sender->requests[7]->getUri()->getPath())->toEndWith('/plans/P1/scheduled_transactions/ST1');
+	expect($sender->requests[8]->getUri()->getPath())->toEndWith('/plans/P1/payee_locations');
+	expect($sender->requests[9]->getUri()->getPath())->toEndWith('/plans/P1/payee_locations/PL1');
+	expect($sender->requests[10]->getUri()->getPath())->toEndWith('/plans/P1/payees/PY1/payee_locations');
+});
+
+it('supports additional plan-scoped read endpoints from the openapi audit', function () {
+	$sender = new ArrayRequestSender([
+		fn ($request) => new Response(200, [], '{"data":{"plan":{"id":"P1","name":"Main"}}}'),
+		fn ($request) => new Response(200, [], '{"data":{"account":{"id":"A1","name":"Checking","type":"checking","closed":false}}}'),
+		fn ($request) => new Response(200, [], '{"data":{"payee":{"id":"PY1","name":"Store","deleted":false}}}'),
+		fn ($request) => new Response(200, [], '{"data":{"category_groups":[{"id":"CG1","name":"Essentials","hidden":false,"deleted":false}],"server_knowledge":1}}'),
+		fn ($request) => new Response(200, [], '{"data":{"category_group":{"id":"CG1","name":"Essentials","hidden":false,"deleted":false}}}'),
+		fn ($request) => new Response(200, [], '{"data":{"transaction":{"id":"T1","account_id":"A1","amount":-1000,"is_pending":false},"server_knowledge":1}}'),
+		fn ($request) => new Response(200, [], '{"data":{"transactions":[{"id":"T2","account_id":"A1","amount":-1000,"is_pending":false}],"server_knowledge":2}}'),
+		fn ($request) => new Response(200, [], '{"data":{"transactions":[{"id":"T3","account_id":"A1","amount":-1000,"is_pending":false}],"server_knowledge":3}}'),
+		fn ($request) => new Response(200, [], '{"data":{"transactions":[{"id":"T4","account_id":"A1","amount":-1000,"is_pending":false}],"server_knowledge":4}}'),
+		fn ($request) => new Response(200, [], '{"data":{"transactions":[{"id":"T5","account_id":"A1","amount":-1000,"is_pending":false}],"server_knowledge":5}}'),
+	]);
+
+	$client = YnabClient::withApiKey('api-key-123', requestSender: $sender);
+
+	$plan = $client->plan('P1');
+	$account = $client->account('P1', 'A1');
+	$payee = $client->payee('P1', 'PY1');
+	$groups = $client->categoryGroups('P1');
+	$group = $client->categoryGroup('P1', 'CG1');
+	$transaction = $client->transaction('P1', 'T1');
+	$txByAccount = $client->transactionsByAccount('P1', 'A1');
+	$txByCategory = $client->transactionsByCategory('P1', 'C1');
+	$txByPayee = $client->transactionsByPayee('P1', 'PY1');
+	$txByMonth = $client->transactionsByMonth('P1', '2026-03-01');
+
+	expect($plan?->id)->toBe('P1');
+	expect($account?->id)->toBe('A1');
+	expect($payee?->id)->toBe('PY1');
+	expect($groups->items)->toHaveCount(1);
+	expect($group?->id)->toBe('CG1');
+	expect($transaction?->id)->toBe('T1');
+	expect($txByAccount->items)->toHaveCount(1);
+	expect($txByCategory->items)->toHaveCount(1);
+	expect($txByPayee->items)->toHaveCount(1);
+	expect($txByMonth->items)->toHaveCount(1);
+
+	expect($sender->requests[0]->getUri()->getPath())->toEndWith('/plans/P1');
+	expect($sender->requests[1]->getUri()->getPath())->toEndWith('/plans/P1/accounts/A1');
+	expect($sender->requests[2]->getUri()->getPath())->toEndWith('/plans/P1/payees/PY1');
+	expect($sender->requests[3]->getUri()->getPath())->toEndWith('/plans/P1/category_groups');
+	expect($sender->requests[4]->getUri()->getPath())->toEndWith('/plans/P1/category_groups/CG1');
+	expect($sender->requests[5]->getUri()->getPath())->toEndWith('/plans/P1/transactions/T1');
+	expect($sender->requests[6]->getUri()->getPath())->toEndWith('/plans/P1/accounts/A1/transactions');
+	expect($sender->requests[7]->getUri()->getPath())->toEndWith('/plans/P1/categories/C1/transactions');
+	expect($sender->requests[8]->getUri()->getPath())->toEndWith('/plans/P1/payees/PY1/transactions');
+	expect($sender->requests[9]->getUri()->getPath())->toEndWith('/plans/P1/months/2026-03-01/transactions');
+});

@@ -3,8 +3,14 @@
 declare(strict_types=1);
 
 use JPry\YNAB\Model\Budget;
+use JPry\YNAB\Model\CategoryGroup;
+use JPry\YNAB\Model\MoneyMovement;
+use JPry\YNAB\Model\MoneyMovementGroup;
+use JPry\YNAB\Model\Month;
+use JPry\YNAB\Model\PayeeLocation;
 use JPry\YNAB\Model\Plan;
 use JPry\YNAB\Model\PlanSettings;
+use JPry\YNAB\Model\ScheduledTransaction;
 use JPry\YNAB\Model\Transaction;
 use JPry\YNAB\Model\User;
 
@@ -92,4 +98,92 @@ it('maps plan settings into typed objects', function () {
 	expect($settings->currencySymbolFirst)->toBeTrue();
 	expect($settings->currencyDisplaySymbol)->toBeTrue();
 	expect($settings->currencyExampleFormat)->toBe('$12,345.67');
+});
+
+it('maps month rows into typed objects', function () {
+	$month = Month::fromArray([
+		'month' => '2026-03-01',
+		'income' => 100000,
+		'budgeted' => 60000,
+		'activity' => -25000,
+		'to_be_budgeted' => 40000,
+		'age_of_money' => 32,
+		'deleted' => false,
+	]);
+
+	expect($month)->not->toBeNull();
+	expect($month?->month)->toBe('2026-03-01');
+	expect($month?->toBeBudgeted)->toBe(40000);
+});
+
+it('maps money movement rows into typed objects', function () {
+	$movement = MoneyMovement::fromArray([
+		'id' => 'MM1',
+		'month' => '2026-03-01',
+		'moved_at' => '2026-03-10T12:00:00Z',
+		'amount' => 12000,
+		'from_category_id' => 'C1',
+		'to_category_id' => 'C2',
+	]);
+
+	expect($movement)->not->toBeNull();
+	expect($movement?->id)->toBe('MM1');
+	expect($movement?->amount)->toBe(12000);
+	expect($movement?->fromCategoryId)->toBe('C1');
+});
+
+it('maps money movement group rows into typed objects', function () {
+	$group = MoneyMovementGroup::fromArray([
+		'id' => 'MMG1',
+		'group_created_at' => '2026-03-10T12:00:00Z',
+		'month' => '2026-03-01',
+	]);
+
+	expect($group)->not->toBeNull();
+	expect($group?->id)->toBe('MMG1');
+	expect($group?->groupCreatedAt)->toBe('2026-03-10T12:00:00Z');
+});
+
+it('maps payee location rows into typed objects', function () {
+	$location = PayeeLocation::fromArray([
+		'id' => 'PL1',
+		'payee_id' => 'P1',
+		'latitude' => '41.8781',
+		'longitude' => '-87.6298',
+		'deleted' => false,
+	]);
+
+	expect($location)->not->toBeNull();
+	expect($location?->id)->toBe('PL1');
+	expect($location?->payeeId)->toBe('P1');
+});
+
+it('maps scheduled transaction rows into typed objects', function () {
+	$scheduled = ScheduledTransaction::fromArray([
+		'id' => 'ST1',
+		'account_id' => 'A1',
+		'date_first' => '2026-03-01',
+		'date_next' => '2026-04-01',
+		'frequency' => 'monthly',
+		'amount' => -1000,
+		'deleted' => false,
+	]);
+
+	expect($scheduled)->not->toBeNull();
+	expect($scheduled?->id)->toBe('ST1');
+	expect($scheduled?->frequency)->toBe('monthly');
+	expect($scheduled?->amount)->toBe(-1000);
+});
+
+it('maps category group rows into typed objects', function () {
+	$group = CategoryGroup::fromArray([
+		'id' => 'CG1',
+		'name' => 'Essentials',
+		'hidden' => false,
+		'deleted' => false,
+	]);
+
+	expect($group)->not->toBeNull();
+	expect($group?->id)->toBe('CG1');
+	expect($group?->name)->toBe('Essentials');
 });

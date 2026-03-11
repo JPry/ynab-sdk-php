@@ -18,10 +18,16 @@ use JPry\YNAB\Internal\YnabErrorParser;
 use JPry\YNAB\Model\Account;
 use JPry\YNAB\Model\Budget;
 use JPry\YNAB\Model\Category;
+use JPry\YNAB\Model\CategoryGroup;
+use JPry\YNAB\Model\Month;
+use JPry\YNAB\Model\MoneyMovement;
+use JPry\YNAB\Model\MoneyMovementGroup;
 use JPry\YNAB\Model\Payee;
+use JPry\YNAB\Model\PayeeLocation;
 use JPry\YNAB\Model\Plan;
 use JPry\YNAB\Model\PlanSettings;
 use JPry\YNAB\Model\ResourceCollection;
+use JPry\YNAB\Model\ScheduledTransaction;
 use JPry\YNAB\Model\Transaction;
 use JPry\YNAB\Model\User;
 use Psr\Http\Message\ResponseInterface;
@@ -102,6 +108,124 @@ final readonly class YnabClient
 	{
 		$data = $this->get("/plans/{$planId}/settings");
 		return is_array($data['settings'] ?? null) ? PlanSettings::fromArray($data['settings']) : null;
+	}
+
+	public function plan(string $planId): ?Plan
+	{
+		return $this->item("/plans/{$planId}", [], ['plan', 'budget'], static fn (array $row): ?Plan => Plan::fromArray($row));
+	}
+
+	public function account(string $planId, string $accountId): ?Account
+	{
+		return $this->item("/plans/{$planId}/accounts/{$accountId}", [], 'account', static fn (array $row): ?Account => Account::fromArray($row));
+	}
+
+	public function payee(string $planId, string $payeeId): ?Payee
+	{
+		return $this->item("/plans/{$planId}/payees/{$payeeId}", [], 'payee', static fn (array $row): ?Payee => Payee::fromArray($row));
+	}
+
+	/** @return ResourceCollection<CategoryGroup> */
+	public function categoryGroups(string $planId, array $query = []): ResourceCollection
+	{
+		return $this->collection("/plans/{$planId}/category_groups", $query, 'category_groups', static fn (array $row): ?CategoryGroup => CategoryGroup::fromArray($row));
+	}
+
+	public function categoryGroup(string $planId, string $categoryGroupId): ?CategoryGroup
+	{
+		return $this->item("/plans/{$planId}/category_groups/{$categoryGroupId}", [], 'category_group', static fn (array $row): ?CategoryGroup => CategoryGroup::fromArray($row));
+	}
+
+	/** @return ResourceCollection<PayeeLocation> */
+	public function payeeLocations(string $planId, array $query = []): ResourceCollection
+	{
+		return $this->collection("/plans/{$planId}/payee_locations", $query, 'payee_locations', static fn (array $row): ?PayeeLocation => PayeeLocation::fromArray($row));
+	}
+
+	public function payeeLocation(string $planId, string $payeeLocationId): ?PayeeLocation
+	{
+		return $this->item("/plans/{$planId}/payee_locations/{$payeeLocationId}", [], 'payee_location', static fn (array $row): ?PayeeLocation => PayeeLocation::fromArray($row));
+	}
+
+	/** @return ResourceCollection<PayeeLocation> */
+	public function payeeLocationsByPayee(string $planId, string $payeeId, array $query = []): ResourceCollection
+	{
+		return $this->collection("/plans/{$planId}/payees/{$payeeId}/payee_locations", $query, 'payee_locations', static fn (array $row): ?PayeeLocation => PayeeLocation::fromArray($row));
+	}
+
+	/** @return ResourceCollection<Month> */
+	public function months(string $planId, array $query = []): ResourceCollection
+	{
+		return $this->collection("/plans/{$planId}/months", $query, 'months', static fn (array $row): ?Month => Month::fromArray($row));
+	}
+
+	public function month(string $planId, string $month): ?Month
+	{
+		return $this->item("/plans/{$planId}/months/{$month}", [], 'month', static fn (array $row): ?Month => Month::fromArray($row));
+	}
+
+	/** @return ResourceCollection<MoneyMovement> */
+	public function moneyMovements(string $planId, array $query = []): ResourceCollection
+	{
+		return $this->collection("/plans/{$planId}/money_movements", $query, 'money_movements', static fn (array $row): ?MoneyMovement => MoneyMovement::fromArray($row));
+	}
+
+	/** @return ResourceCollection<MoneyMovement> */
+	public function moneyMovementsByMonth(string $planId, string $month, array $query = []): ResourceCollection
+	{
+		return $this->collection("/plans/{$planId}/months/{$month}/money_movements", $query, 'money_movements', static fn (array $row): ?MoneyMovement => MoneyMovement::fromArray($row));
+	}
+
+	/** @return ResourceCollection<MoneyMovementGroup> */
+	public function moneyMovementGroups(string $planId, array $query = []): ResourceCollection
+	{
+		return $this->collection("/plans/{$planId}/money_movement_groups", $query, 'money_movement_groups', static fn (array $row): ?MoneyMovementGroup => MoneyMovementGroup::fromArray($row));
+	}
+
+	/** @return ResourceCollection<MoneyMovementGroup> */
+	public function moneyMovementGroupsByMonth(string $planId, string $month, array $query = []): ResourceCollection
+	{
+		return $this->collection("/plans/{$planId}/months/{$month}/money_movement_groups", $query, 'money_movement_groups', static fn (array $row): ?MoneyMovementGroup => MoneyMovementGroup::fromArray($row));
+	}
+
+	public function transaction(string $planId, string $transactionId): ?Transaction
+	{
+		return $this->item("/plans/{$planId}/transactions/{$transactionId}", [], 'transaction', static fn (array $row): ?Transaction => Transaction::fromArray($row));
+	}
+
+	/** @return ResourceCollection<Transaction> */
+	public function transactionsByAccount(string $planId, string $accountId, array $query = []): ResourceCollection
+	{
+		return $this->collection("/plans/{$planId}/accounts/{$accountId}/transactions", $query, 'transactions', static fn (array $row): ?Transaction => Transaction::fromArray($row));
+	}
+
+	/** @return ResourceCollection<Transaction> */
+	public function transactionsByCategory(string $planId, string $categoryId, array $query = []): ResourceCollection
+	{
+		return $this->collection("/plans/{$planId}/categories/{$categoryId}/transactions", $query, 'transactions', static fn (array $row): ?Transaction => Transaction::fromArray($row));
+	}
+
+	/** @return ResourceCollection<Transaction> */
+	public function transactionsByPayee(string $planId, string $payeeId, array $query = []): ResourceCollection
+	{
+		return $this->collection("/plans/{$planId}/payees/{$payeeId}/transactions", $query, 'transactions', static fn (array $row): ?Transaction => Transaction::fromArray($row));
+	}
+
+	/** @return ResourceCollection<Transaction> */
+	public function transactionsByMonth(string $planId, string $month, array $query = []): ResourceCollection
+	{
+		return $this->collection("/plans/{$planId}/months/{$month}/transactions", $query, 'transactions', static fn (array $row): ?Transaction => Transaction::fromArray($row));
+	}
+
+	/** @return ResourceCollection<ScheduledTransaction> */
+	public function scheduledTransactions(string $planId, array $query = []): ResourceCollection
+	{
+		return $this->collection("/plans/{$planId}/scheduled_transactions", $query, 'scheduled_transactions', static fn (array $row): ?ScheduledTransaction => ScheduledTransaction::fromArray($row));
+	}
+
+	public function scheduledTransaction(string $planId, string $scheduledTransactionId): ?ScheduledTransaction
+	{
+		return $this->item("/plans/{$planId}/scheduled_transactions/{$scheduledTransactionId}", [], 'scheduled_transaction', static fn (array $row): ?ScheduledTransaction => ScheduledTransaction::fromArray($row));
 	}
 
 	/** @return ResourceCollection<Account> */
@@ -326,6 +450,24 @@ final readonly class YnabClient
 		}
 
 		return new ResourceCollection($items, $serverKnowledge);
+	}
+
+	/**
+	 * @template T
+	 * @param callable(array<string,mixed>):?T $mapper
+	 * @param non-empty-string|list<non-empty-string> $key
+	 * @return ?T
+	 */
+	private function item(string $path, array $query, string|array $key, callable $mapper): mixed
+	{
+		$data = $this->get($path, $query);
+		$keys = is_array($key) ? $key : [$key];
+		$row = $this->firstArrayByKeys($data, $keys);
+		if (!is_array($row)) {
+			return null;
+		}
+
+		return $mapper($row);
 	}
 
 	/**
