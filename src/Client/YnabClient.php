@@ -90,18 +90,21 @@ final readonly class YnabClient
 	/** @return ResourceCollection<Account> */
 	public function accounts(string $budgetId, array $query = []): ResourceCollection
 	{
-		return $this->collection("/plans/{$budgetId}/accounts", $query, 'accounts', static fn (array $row): ?Account => Account::fromArray($row));
+		$planId = $budgetId;
+
+		return $this->collection("/plans/{$planId}/accounts", $query, 'accounts', static fn (array $row): ?Account => Account::fromArray($row));
 	}
 
 	/** @return ResourceCollection<Category> */
 	public function categories(string $budgetId, array $query = []): ResourceCollection
 	{
+		$planId = $budgetId;
 		$items = [];
 		$serverKnowledge = null;
 		$nextQuery = $query;
 
 		while (true) {
-			$data = $this->get("/plans/{$budgetId}/categories", $nextQuery);
+			$data = $this->get("/plans/{$planId}/categories", $nextQuery);
 			$serverKnowledge = $this->serverKnowledge($data) ?? $serverKnowledge;
 
 			$groups = $data['category_groups'] ?? [];
@@ -155,13 +158,17 @@ final readonly class YnabClient
 	/** @return ResourceCollection<Payee> */
 	public function payees(string $budgetId, array $query = []): ResourceCollection
 	{
-		return $this->collection("/plans/{$budgetId}/payees", $query, 'payees', static fn (array $row): ?Payee => Payee::fromArray($row));
+		$planId = $budgetId;
+
+		return $this->collection("/plans/{$planId}/payees", $query, 'payees', static fn (array $row): ?Payee => Payee::fromArray($row));
 	}
 
 	/** @return ResourceCollection<Transaction> */
 	public function transactions(string $budgetId, array $query = []): ResourceCollection
 	{
-		return $this->collection("/plans/{$budgetId}/transactions", $query, 'transactions', static fn (array $row): ?Transaction => Transaction::fromArray($row));
+		$planId = $budgetId;
+
+		return $this->collection("/plans/{$planId}/transactions", $query, 'transactions', static fn (array $row): ?Transaction => Transaction::fromArray($row));
 	}
 
 	/**
@@ -170,7 +177,9 @@ final readonly class YnabClient
 	 */
 	public function patchTransactions(string $budgetId, array $payload): array
 	{
-		return $this->request('PATCH', "/plans/{$budgetId}/transactions", [], $payload);
+		$planId = $budgetId;
+
+		return $this->request('PATCH', "/plans/{$planId}/transactions", [], $payload);
 	}
 
 	/**
