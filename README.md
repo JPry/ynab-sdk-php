@@ -7,8 +7,8 @@ Repository: [jpry/ynab-sdk-php](https://github.com/JPry/ynab-sdk-php)
 ## Highlights
 
 - Namespace root: `JPry\\YNAB\\`
-- Typed resources for budgets, accounts, categories, payees, and transactions
-- Endpoint-by-name client methods (`budgets()`, `transactions()`, etc.)
+- Typed resources for plans, accounts, categories, payees, and transactions
+- Endpoint-by-name client methods (`plans()`, `transactions()`, etc.)
 - Structured YNAB errors (`error.id`, `error.name`, `error.detail`)
 - Supports API key auth and OAuth token auth
 - Uses PSR-7/PSR-18 HTTP contracts; any codebase can provide its own sender by implementing `JPry\\YNAB\\Http\\RequestSender`
@@ -40,9 +40,11 @@ $config = new ClientConfig(
 );
 
 $client = YnabClient::withApiKey('your-api-key', config: $config);
-$budgets = $client->budgets();
-$transactions = $client->transactions('budget-id', ['since_date' => '2026-01-01']);
+$plans = $client->plans();
+$transactions = $client->transactions('plan-id', ['since_date' => '2026-01-01']);
 ```
+
+Legacy budget-named APIs (`budgets()`, `defaultBudget()`, and `JPry\\YNAB\\Model\\Budget`) remain available for backward compatibility but are deprecated and emit `E_USER_DEPRECATED` warnings.
 
 ### OAuth token
 
