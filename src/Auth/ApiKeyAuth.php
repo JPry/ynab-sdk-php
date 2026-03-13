@@ -16,4 +16,11 @@ final readonly class ApiKeyAuth implements AuthMethod
 
 		return $headers;
 	}
+
+	public function __debugInfo(): ?array
+	{
+		return [
+			'apiKey' => 'REDACTED API key',
+		];
+	}
 }

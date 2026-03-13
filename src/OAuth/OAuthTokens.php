@@ -36,4 +36,13 @@ final readonly class OAuthTokens
 			tokenType: (string) ($payload['token_type'] ?? 'Bearer'),
 		);
 	}
+
+	public function __debugInfo(): ?array {
+		return [
+			'accessToken' => 'REDACTED access token',
+			'refreshToken' => 'REDACTED refresh token',
+			'expiresIn' => $this->expiresIn,
+			'tokenType' => $this->tokenType,
+		];
+	}
 }

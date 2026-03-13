@@ -14,4 +14,15 @@ final readonly class OAuthConfig
 		public string $tokenUrl = 'https://app.ynab.com/oauth/token',
 	) {
 	}
+
+	public function __debugInfo(): ?array
+	{
+		return [
+			'clientId' => 'REDACTED client ID',
+			'clientSecret' => 'REDACTED client secret',
+			'redirectUri' => $this->redirectUri,
+			'authorizeUrl' => $this->authorizeUrl,
+			'tokenUrl' => $this->tokenUrl,
+		];
+	}
 }

@@ -38,4 +38,12 @@ final class OAuthTokenAuth implements AuthMethod
 
 		return $this->accessToken;
 	}
+
+	public function __debugInfo(): ?array
+	{
+		return [
+			'accessToken' => 'REDACTED access token',
+			'refreshAccessToken' => $this->refreshAccessToken === null ? null : 'REDACTED refresh token',
+		];
+	}
 }
