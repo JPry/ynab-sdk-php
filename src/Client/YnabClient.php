@@ -624,9 +624,7 @@ final readonly class YnabClient
 	{
 		$base = rtrim($this->config->baseUrl, '/');
 		$route = ltrim($path, '/');
-		$url = str_starts_with($path, 'http://') || str_starts_with($path, 'https://')
-			? $path
-			: "{$base}/{$route}";
+		$url = "{$base}/{$route}";
 		$url = $this->appendQuery($url, $query);
 
 		$headers = $this->auth->apply([
@@ -820,10 +818,6 @@ final readonly class YnabClient
 		}
 
 		parse_str($query, $parsed);
-		if (!is_array($parsed)) {
-			return [];
-		}
-
 		$normalized = [];
 		foreach ($parsed as $key => $value) {
 			if (!is_string($key) || !is_scalar($value)) {

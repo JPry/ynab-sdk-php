@@ -22,11 +22,10 @@ final class GuzzleRequestSender implements RequestSender
 			throw new YnabException('guzzlehttp/guzzle is required for GuzzleRequestSender. Install it or provide a custom RequestSender implementation.');
 		}
 
-		$normalizedBaseUrl = rtrim($this->config->baseUrl, '/');
 		$this->client = new Client([
-			'base_uri' => "{$normalizedBaseUrl}/",
 			'timeout' => $this->config->timeoutSeconds,
 			'http_errors' => false,
+			'verify' => true,
 		]);
 	}
 
