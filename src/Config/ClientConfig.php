@@ -10,6 +10,25 @@ final readonly class ClientConfig
 		public string $baseUrl = 'https://api.ynab.com/v1',
 		public int $timeoutSeconds = 30,
 		public int $maxRetries = 2,
+		public bool $allowInsecure = false,
 	) {
+		$this->assertValidBaseUrl($this->baseUrl, $this->allowInsecure);
+	}
+
+	private function assertValidBaseUrl(string $baseUrl, bool $allowInsecure): void
+	{
+		if (str_starts_with($baseUrl, 'https://')) {
+			return;
+		}
+
+		if ($allowInsecure && str_starts_with($baseUrl, 'http://')) {
+			return;
+		}
+
+		$message = $allowInsecure
+			? 'ClientConfig baseUrl must start with http:// or https://.'
+			: 'ClientConfig baseUrl must start with https://. Pass allowInsecure: true only for local testing.';
+
+		throw new \InvalidArgumentException($message);
 	}
 }
