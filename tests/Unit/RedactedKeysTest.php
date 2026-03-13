@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use JPry\YNAB\Auth\ApiKeyAuth;
 use JPry\YNAB\Auth\OAuthTokenAuth;
+use JPry\YNAB\Exception\InvalidStringException;
 use JPry\YNAB\OAuth\OAuthConfig;
 use JPry\YNAB\OAuth\OAuthTokens;
 
@@ -172,5 +173,48 @@ it(
 		expect($output)->not->toContain($refreshToken);
 		expect($output)->toContain('REDACTED access token');
 		expect($output)->toContain('REDACTED refresh token');
+	}
+);
+
+it(
+	'Throws InvalidStringException when ApiKeyAuth is constructed with an empty string',
+	function() {
+		expect(fn() => new ApiKeyAuth(''))->toThrow(InvalidStringException::class);
+	}
+);
+
+it(
+	'Throws InvalidStringException when ApiKeyAuth is constructed with a whitespace-only string',
+	function() {
+		expect(fn() => new ApiKeyAuth('   '))->toThrow(InvalidStringException::class);
+		expect(fn() => new ApiKeyAuth("\t"))->toThrow(InvalidStringException::class);
+		expect(fn() => new ApiKeyAuth("\n"))->toThrow(InvalidStringException::class);
+	}
+);
+
+it(
+	'Throws InvalidStringException when OAuthTokenAuth is constructed with an empty access token',
+	function() {
+		expect(fn() => new OAuthTokenAuth(''))->toThrow(InvalidStringException::class);
+	}
+);
+
+it(
+	'Throws InvalidStringException when OAuthTokenAuth is constructed with a whitespace-only access token',
+	function() {
+		expect(fn() => new OAuthTokenAuth('   '))->toThrow(InvalidStringException::class);
+		expect(fn() => new OAuthTokenAuth("\t"))->toThrow(InvalidStringException::class);
+		expect(fn() => new OAuthTokenAuth("\n"))->toThrow(InvalidStringException::class);
+	}
+);
+
+it(
+	'Accepts a valid access token with an optional refresh callable in OAuthTokenAuth',
+	function() {
+		$auth = new OAuthTokenAuth('valid-token');
+		expect($auth)->toBeInstanceOf(OAuthTokenAuth::class);
+
+		$authWithRefresh = new OAuthTokenAuth('valid-token', fn() => 'new-token');
+		expect($authWithRefresh)->toBeInstanceOf(OAuthTokenAuth::class);
 	}
 );
