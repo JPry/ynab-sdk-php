@@ -11,6 +11,7 @@ final readonly class ClientConfig
 		public int $timeoutSeconds = 30,
 		public int $maxRetries = 2,
 		public bool $allowInsecure = false,
+		public int $maxPages = 100,
 	) {
 		$this->assertValidBaseUrl($this->baseUrl, $this->allowInsecure);
 	}

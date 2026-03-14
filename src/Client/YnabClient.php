@@ -258,8 +258,14 @@ final readonly class YnabClient
 		$items = [];
 		$serverKnowledge = null;
 		$nextQuery = $query;
+		$pageCount = 0;
 
 		while (true) {
+			$pageCount++;
+			if ($pageCount > $this->config->maxPages) {
+				throw new YnabException("Pagination limit of {$this->config->maxPages} pages exceeded.");
+			}
+
 			$data = $this->get("/plans/{$planId}/categories", $nextQuery);
 			$serverKnowledge = $this->serverKnowledge($data) ?? $serverKnowledge;
 
@@ -653,8 +659,14 @@ final readonly class YnabClient
 		$serverKnowledge = null;
 		$nextQuery = $query;
 		$keys = is_array($key) ? $key : [$key];
+		$pageCount = 0;
 
 		while (true) {
+			$pageCount++;
+			if ($pageCount > $this->config->maxPages) {
+				throw new YnabException("Pagination limit of {$this->config->maxPages} pages exceeded.");
+			}
+
 			$data = $this->get($path, $nextQuery);
 			$serverKnowledge = $this->serverKnowledge($data) ?? $serverKnowledge;
 
