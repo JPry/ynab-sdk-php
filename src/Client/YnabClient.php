@@ -282,20 +282,17 @@ final readonly class YnabClient
 							continue;
 						}
 
-						$id = trim((string) ($category['id'] ?? ''));
-						if ($id === '') {
+						$item = Category::fromArray($category, [
+							'groupId' => $groupId,
+							'groupName' => $groupName,
+							'groupOrder' => (int) $groupOrder,
+							'categoryOrder' => (int) $categoryOrder,
+						]);
+						if ($item === null) {
 							continue;
 						}
 
-						$items[] = new Category(
-							id: $id,
-							name: (string) ($category['name'] ?? ''),
-							groupId: $groupId,
-							groupName: $groupName,
-							groupOrder: (int) $groupOrder,
-							categoryOrder: (int) $categoryOrder,
-							hidden: (bool) ($category['hidden'] ?? false),
-						);
+						$items[] = $item;
 					}
 				}
 			}
@@ -373,24 +370,7 @@ final readonly class YnabClient
 	 */
 	public function updateTransaction(string $planId, UpdateTransactionRequest|string $transactionId, ?array $payload = null): array
 	{
-		if ($transactionId instanceof UpdateTransactionRequest) {
-			if ($payload !== null) {
-				throw new YnabException('When passing UpdateTransactionRequest, omit the $payload argument.');
-			}
-
-			return $this->request(
-				'PUT',
-				"/plans/{$planId}/transactions/{$this->resolveModelId($transactionId)}",
-				[],
-				$transactionId->toArray(),
-			);
-		}
-
-		if ($payload === null) {
-			throw new YnabException('updateTransaction() requires $payload when $transactionId is a string.');
-		}
-
-		return $this->request('PUT', "/plans/{$planId}/transactions/{$transactionId}", [], $payload);
+		return $this->mutate('PUT', "/plans/{$planId}/transactions", 'updateTransaction', $transactionId, $payload);
 	}
 
 	/**
@@ -418,24 +398,7 @@ final readonly class YnabClient
 	 */
 	public function updateScheduledTransaction(string $planId, UpdateScheduledTransactionRequest|string $scheduledTransactionId, ?array $payload = null): array
 	{
-		if ($scheduledTransactionId instanceof UpdateScheduledTransactionRequest) {
-			if ($payload !== null) {
-				throw new YnabException('When passing UpdateScheduledTransactionRequest, omit the $payload argument.');
-			}
-
-			return $this->request(
-				'PUT',
-				"/plans/{$planId}/scheduled_transactions/{$this->resolveModelId($scheduledTransactionId)}",
-				[],
-				$scheduledTransactionId->toArray(),
-			);
-		}
-
-		if ($payload === null) {
-			throw new YnabException('updateScheduledTransaction() requires $payload when $scheduledTransactionId is a string.');
-		}
-
-		return $this->request('PUT', "/plans/{$planId}/scheduled_transactions/{$scheduledTransactionId}", [], $payload);
+		return $this->mutate('PUT', "/plans/{$planId}/scheduled_transactions", 'updateScheduledTransaction', $scheduledTransactionId, $payload);
 	}
 
 	/**
@@ -472,24 +435,7 @@ final readonly class YnabClient
 	 */
 	public function updateCategory(string $planId, UpdateCategoryRequest|string $categoryId, ?array $payload = null): array
 	{
-		if ($categoryId instanceof UpdateCategoryRequest) {
-			if ($payload !== null) {
-				throw new YnabException('When passing UpdateCategoryRequest, omit the $payload argument.');
-			}
-
-			return $this->request(
-				'PATCH',
-				"/plans/{$planId}/categories/{$this->resolveModelId($categoryId)}",
-				[],
-				$categoryId->toArray(),
-			);
-		}
-
-		if ($payload === null) {
-			throw new YnabException('updateCategory() requires $payload when $categoryId is a string.');
-		}
-
-		return $this->request('PATCH', "/plans/{$planId}/categories/{$categoryId}", [], $payload);
+		return $this->mutate('PATCH', "/plans/{$planId}/categories", 'updateCategory', $categoryId, $payload);
 	}
 
 	/**
@@ -499,24 +445,7 @@ final readonly class YnabClient
 	 */
 	public function updateMonthCategory(string $planId, string $month, UpdateMonthCategoryRequest|string $categoryId, ?array $payload = null): array
 	{
-		if ($categoryId instanceof UpdateMonthCategoryRequest) {
-			if ($payload !== null) {
-				throw new YnabException('When passing UpdateMonthCategoryRequest, omit the $payload argument.');
-			}
-
-			return $this->request(
-				'PATCH',
-				"/plans/{$planId}/months/{$month}/categories/{$this->resolveModelId($categoryId)}",
-				[],
-				$categoryId->toArray(),
-			);
-		}
-
-		if ($payload === null) {
-			throw new YnabException('updateMonthCategory() requires $payload when $categoryId is a string.');
-		}
-
-		return $this->request('PATCH', "/plans/{$planId}/months/{$month}/categories/{$categoryId}", [], $payload);
+		return $this->mutate('PATCH', "/plans/{$planId}/months/{$month}/categories", 'updateMonthCategory', $categoryId, $payload);
 	}
 
 	/**
@@ -535,24 +464,7 @@ final readonly class YnabClient
 	 */
 	public function updateCategoryGroup(string $planId, UpdateCategoryGroupRequest|string $categoryGroupId, ?array $payload = null): array
 	{
-		if ($categoryGroupId instanceof UpdateCategoryGroupRequest) {
-			if ($payload !== null) {
-				throw new YnabException('When passing UpdateCategoryGroupRequest, omit the $payload argument.');
-			}
-
-			return $this->request(
-				'PATCH',
-				"/plans/{$planId}/category_groups/{$this->resolveModelId($categoryGroupId)}",
-				[],
-				$categoryGroupId->toArray(),
-			);
-		}
-
-		if ($payload === null) {
-			throw new YnabException('updateCategoryGroup() requires $payload when $categoryGroupId is a string.');
-		}
-
-		return $this->request('PATCH', "/plans/{$planId}/category_groups/{$categoryGroupId}", [], $payload);
+		return $this->mutate('PATCH', "/plans/{$planId}/category_groups", 'updateCategoryGroup', $categoryGroupId, $payload);
 	}
 
 	/**
@@ -562,24 +474,7 @@ final readonly class YnabClient
 	 */
 	public function updatePayee(string $planId, UpdatePayeeRequest|string $payeeId, ?array $payload = null): array
 	{
-		if ($payeeId instanceof UpdatePayeeRequest) {
-			if ($payload !== null) {
-				throw new YnabException('When passing UpdatePayeeRequest, omit the $payload argument.');
-			}
-
-			return $this->request(
-				'PATCH',
-				"/plans/{$planId}/payees/{$this->resolveModelId($payeeId)}",
-				[],
-				$payeeId->toArray(),
-			);
-		}
-
-		if ($payload === null) {
-			throw new YnabException('updatePayee() requires $payload when $payeeId is a string.');
-		}
-
-		return $this->request('PATCH', "/plans/{$planId}/payees/{$payeeId}", [], $payload);
+		return $this->mutate('PATCH', "/plans/{$planId}/payees", 'updatePayee', $payeeId, $payload);
 	}
 
 	/**
@@ -600,6 +495,53 @@ final readonly class YnabClient
 	}
 
 	/**
+	 * Validate one or more URL path segment values.
+	 * Throws if any value is empty or contains characters that would alter the URL path or query string.
+	 *
+	 * @param array<string,string> $segments  Map of parameter name => value
+	 * @throws YnabException
+	 */
+	private function validatePathSegments(array $segments): void
+	{
+		foreach ($segments as $name => $value) {
+			if (trim($value) === '') {
+				throw new YnabException("The '{$name}' parameter cannot be empty.");
+			}
+
+			if (strpbrk($value, '/?#\\') !== false) {
+				throw new YnabException("The '{$name}' parameter contains invalid URL characters.");
+			}
+		}
+	}
+
+	/**
+	 * @param RequestModel|string $idOrModel
+	 * @param null|array<string,mixed> $payload
+	 * @return array<string,mixed>
+	 */
+	private function mutate(string $httpMethod, string $basePath, string $callerName, RequestModel|string $idOrModel, ?array $payload): array
+	{
+		if ($idOrModel instanceof RequestModel) {
+			if ($payload !== null) {
+				$shortName = basename(str_replace('\\', '/', $idOrModel::class));
+				throw new YnabException("When passing {$shortName}, omit the \$payload argument.");
+			}
+
+			$id = $this->resolveModelId($idOrModel);
+
+			return $this->request($httpMethod, "{$basePath}/{$id}", [], $idOrModel->toArray());
+		}
+
+		if ($payload === null) {
+			throw new YnabException("{$callerName}() requires \$payload when the ID is a string.");
+		}
+
+		$this->validatePathSegments(['id' => $idOrModel]);
+
+		return $this->request($httpMethod, "{$basePath}/{$idOrModel}", [], $payload);
+	}
+
+	/**
 	 * @param object{id:string}|string $idCarrier
 	 */
 	private function resolveModelId(string|object $idCarrier): string
@@ -613,6 +555,8 @@ final readonly class YnabClient
 		if ($id === '') {
 			throw new YnabException('Model ID cannot be empty.');
 		}
+
+		$this->validatePathSegments(['id' => $id]);
 
 		return $id;
 	}
