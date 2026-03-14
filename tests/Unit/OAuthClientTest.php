@@ -108,10 +108,32 @@ it('exchangeCodeForTokens throws YnabException when access_token is missing', fu
 it('refreshAccessToken throws YnabException when access_token is missing', function () {
 	$config = makeOAuthConfig();
 	$sender = new ArrayRequestSender([
-		fn ($request) => new Response(400, [], json_encode(['error' => 'invalid_token'])),
+		fn ($request) => new Response(200, [], json_encode(['error' => 'invalid_token'])),
 	]);
 	$client = new OAuthClient($config, $sender);
 
 	expect(fn () => $client->refreshAccessToken('expired-refresh-token'))
 		->toThrow(YnabException::class, 'Could not parse OAuth token response.');
+});
+
+it('exchangeCodeForTokens throws YnabException on 400 HTTP response', function () {
+	$config = makeOAuthConfig();
+	$sender = new ArrayRequestSender([
+		fn ($request) => new Response(400, [], json_encode(['error' => 'invalid_grant'])),
+	]);
+	$client = new OAuthClient($config, $sender);
+
+	expect(fn () => $client->exchangeCodeForTokens('bad-code'))
+		->toThrow(YnabException::class, 'OAuth token request failed with status 400:');
+});
+
+it('refreshAccessToken throws YnabException on 400 HTTP response', function () {
+	$config = makeOAuthConfig();
+	$sender = new ArrayRequestSender([
+		fn ($request) => new Response(400, [], json_encode(['error' => 'invalid_token'])),
+	]);
+	$client = new OAuthClient($config, $sender);
+
+	expect(fn () => $client->refreshAccessToken('expired-refresh-token'))
+		->toThrow(YnabException::class, 'OAuth token request failed with status 400:');
 });

@@ -67,6 +67,12 @@ final readonly class OAuthClient
 			),
 		);
 
+		$status = $response->getStatusCode();
+		if ($status < 200 || $status >= 300) {
+			$body = (string) $response->getBody();
+			throw new YnabException("OAuth token request failed with status {$status}: {$body}");
+		}
+
 		$decoded = json_decode((string) $response->getBody(), true);
 		if (!is_array($decoded)) {
 			$decoded = [];
