@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use JPry\YNAB\Model\Account;
 use JPry\YNAB\Model\Budget;
 use JPry\YNAB\Model\CategoryDetail;
+use JPry\YNAB\Model\Payee;
+use JPry\YNAB\OAuth\OAuthTokens;
 use JPry\YNAB\Model\CategoryGroup;
 use JPry\YNAB\Model\MoneyMovement;
 use JPry\YNAB\Model\MoneyMovementGroup;
@@ -23,28 +26,12 @@ it('maps plan rows into typed objects', function () {
 	expect($plan?->name)->toBe('Main');
 });
 
-it('keeps budget model mapping while warning about deprecation', function () {
-	$warnings = [];
-	$handler = static function (int $errno, string $errstr) use (&$warnings): bool {
-		if ($errno === E_USER_DEPRECATED) {
-			$warnings[] = $errstr;
-			return true;
-		}
-
-		return false;
-	};
-
-	set_error_handler($handler);
-	try {
-		$budget = Budget::fromArray(['id' => 'B1', 'name' => 'Main']);
-	} finally {
-		restore_error_handler();
-	}
+it('keeps budget model mapping', function () {
+	$budget = Budget::fromArray(['id' => 'B1', 'name' => 'Main']);
 
 	expect($budget)->not->toBeNull();
 	expect($budget?->id)->toBe('B1');
 	expect($budget?->name)->toBe('Main');
-	expect(implode("\n", $warnings))->toContain('JPry\\YNAB\\Model\\Budget is deprecated');
 });
 
 it('maps transaction rows and keeps raw payload', function () {
@@ -207,4 +194,90 @@ it('maps category detail rows into typed objects', function () {
 	expect($category?->id)->toBe('C1');
 	expect($category?->categoryGroupId)->toBe('CG1');
 	expect($category?->budgeted)->toBe(25000);
+});
+
+it('maps account rows into typed objects', function () {
+	$account = Account::fromArray([
+		'id' => 'A1',
+		'name' => 'Checking',
+		'type' => 'checking',
+		'closed' => false,
+	]);
+
+	expect($account)->not->toBeNull();
+	expect($account?->id)->toBe('A1');
+	expect($account?->name)->toBe('Checking');
+	expect($account?->type)->toBe('checking');
+	expect($account?->closed)->toBeFalse();
+});
+
+it('returns null from Account::fromArray when id is missing', function () {
+	$account = Account::fromArray([
+		'name' => 'Checking',
+		'type' => 'checking',
+		'closed' => false,
+	]);
+
+	expect($account)->toBeNull();
+});
+
+it('maps payee rows into typed objects', function () {
+	$payee = Payee::fromArray([
+		'id' => 'PY1',
+		'name' => 'Grocery Store',
+		'transfer_account_id' => 'A2',
+		'deleted' => false,
+	]);
+
+	expect($payee)->not->toBeNull();
+	expect($payee?->id)->toBe('PY1');
+	expect($payee?->name)->toBe('Grocery Store');
+	expect($payee?->transferAccountId)->toBe('A2');
+	expect($payee?->deleted)->toBeFalse();
+});
+
+it('maps payee rows with empty string transfer_account_id to null', function () {
+	$payee = Payee::fromArray([
+		'id' => 'PY2',
+		'name' => 'Coffee Shop',
+		'transfer_account_id' => '',
+		'deleted' => false,
+	]);
+
+	expect($payee)->not->toBeNull();
+	expect($payee?->transferAccountId)->toBeNull();
+});
+
+it('returns null from Payee::fromArray when id is missing', function () {
+	$payee = Payee::fromArray([
+		'name' => 'Some Store',
+		'deleted' => false,
+	]);
+
+	expect($payee)->toBeNull();
+});
+
+it('maps OAuthTokens::fromArray to typed object', function () {
+	$tokens = OAuthTokens::fromArray([
+		'access_token' => 'access-abc',
+		'refresh_token' => 'refresh-xyz',
+		'expires_in' => 7200,
+		'token_type' => 'Bearer',
+	]);
+
+	expect($tokens)->not->toBeNull();
+	expect($tokens?->accessToken)->toBe('access-abc');
+	expect($tokens?->refreshToken)->toBe('refresh-xyz');
+	expect($tokens?->expiresIn)->toBe(7200);
+	expect($tokens?->tokenType)->toBe('Bearer');
+});
+
+it('returns null from OAuthTokens::fromArray when access_token is missing', function () {
+	$tokens = OAuthTokens::fromArray([
+		'refresh_token' => 'refresh-xyz',
+		'expires_in' => 7200,
+		'token_type' => 'Bearer',
+	]);
+
+	expect($tokens)->toBeNull();
 });

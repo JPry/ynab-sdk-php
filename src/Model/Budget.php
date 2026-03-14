@@ -17,7 +17,6 @@ final readonly class Budget
 		public string $id,
 		public string $name,
 	) {
-		$this->warnBudgetDeprecation(self::class, Plan::class);
 	}
 
 	/** @param array<string,mixed> $row */
