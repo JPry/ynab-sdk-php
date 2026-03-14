@@ -18,7 +18,6 @@ final readonly class Transaction
 		public ?string $cleared,
 		public ?bool $approved,
 		public ?string $categoryId,
-		public bool $isPending,
 		public array $raw,
 	) {
 	}
@@ -42,7 +41,6 @@ final readonly class Transaction
 			cleared: isset($row['cleared']) ? (string) $row['cleared'] : null,
 			approved: array_key_exists('approved', $row) ? (bool) $row['approved'] : null,
 			categoryId: isset($row['category_id']) ? (string) $row['category_id'] : null,
-			isPending: (bool) ($row['is_pending'] ?? false),
 			raw: $row,
 		);
 	}
