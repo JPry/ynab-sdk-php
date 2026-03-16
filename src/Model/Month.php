@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model;
 
+use JPry\YNAB\Internal\ArrayReader;
+
 final readonly class Month
 {
 	public function __construct(
@@ -22,21 +24,21 @@ final readonly class Month
 	/** @param array<string,mixed> $row */
 	public static function fromArray(array $row): ?self
 	{
-		$month = trim((string) ($row['month'] ?? ''));
-		if ($month === '') {
+		$month = ArrayReader::requiredString($row, 'month');
+		if ($month === null) {
 			return null;
 		}
 
 		return new self(
 			month: $month,
-			note: isset($row['note']) ? (string) $row['note'] : null,
-			income: (int) ($row['income'] ?? 0),
-			budgeted: (int) ($row['budgeted'] ?? 0),
-			activity: (int) ($row['activity'] ?? 0),
-			toBeBudgeted: (int) ($row['to_be_budgeted'] ?? 0),
-			ageOfMoney: array_key_exists('age_of_money', $row) && $row['age_of_money'] !== null ? (int) $row['age_of_money'] : null,
-			deleted: (bool) ($row['deleted'] ?? false),
-			categories: isset($row['categories']) && is_array($row['categories']) ? $row['categories'] : null,
+			note: ArrayReader::nullableString($row, 'note'),
+			income: ArrayReader::int($row, 'income'),
+			budgeted: ArrayReader::int($row, 'budgeted'),
+			activity: ArrayReader::int($row, 'activity'),
+			toBeBudgeted: ArrayReader::int($row, 'to_be_budgeted'),
+			ageOfMoney: ArrayReader::nullableInt($row, 'age_of_money'),
+			deleted: ArrayReader::bool($row, 'deleted'),
+			categories: ArrayReader::nullableArray($row, 'categories'),
 		);
 	}
 }

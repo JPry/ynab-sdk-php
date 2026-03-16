@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model;
 
+use JPry\YNAB\Internal\ArrayReader;
+
 final readonly class CategoryDetail
 {
 	/** @param array<string,mixed> $raw */
@@ -25,8 +27,8 @@ final readonly class CategoryDetail
 	/** @param array<string,mixed> $row */
 	public static function fromArray(array $row): ?self
 	{
-		$id = trim((string) ($row['id'] ?? ''));
-		if ($id === '') {
+		$id = ArrayReader::requiredString($row, 'id');
+		if ($id === null) {
 			return null;
 		}
 
@@ -35,12 +37,12 @@ final readonly class CategoryDetail
 			categoryGroupId: (string) ($row['category_group_id'] ?? ''),
 			categoryGroupName: (string) ($row['category_group_name'] ?? ''),
 			name: (string) ($row['name'] ?? ''),
-			note: isset($row['note']) ? (string) $row['note'] : null,
-			budgeted: (int) ($row['budgeted'] ?? 0),
-			activity: (int) ($row['activity'] ?? 0),
-			balance: (int) ($row['balance'] ?? 0),
-			hidden: (bool) ($row['hidden'] ?? false),
-			deleted: (bool) ($row['deleted'] ?? false),
+			note: ArrayReader::nullableString($row, 'note'),
+			budgeted: ArrayReader::int($row, 'budgeted'),
+			activity: ArrayReader::int($row, 'activity'),
+			balance: ArrayReader::int($row, 'balance'),
+			hidden: ArrayReader::bool($row, 'hidden'),
+			deleted: ArrayReader::bool($row, 'deleted'),
 			raw: $row,
 		);
 	}

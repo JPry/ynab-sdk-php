@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model;
 
+use JPry\YNAB\Internal\ArrayReader;
+
 final readonly class PlanSettings
 {
 	public function __construct(
@@ -22,8 +24,8 @@ final readonly class PlanSettings
 	/** @param array<string,mixed> $row */
 	public static function fromArray(array $row): self
 	{
-		$dateFormat = is_array($row['date_format'] ?? null) ? $row['date_format'] : null;
-		$currencyFormat = is_array($row['currency_format'] ?? null) ? $row['currency_format'] : null;
+		$dateFormat = ArrayReader::nullableArray($row, 'date_format');
+		$currencyFormat = ArrayReader::nullableArray($row, 'currency_format');
 
 		return new self(
 			dateFormat: isset($dateFormat['format']) ? (string) $dateFormat['format'] : null,

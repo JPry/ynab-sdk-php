@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model;
 
+use JPry\YNAB\Internal\ArrayReader;
+
 final readonly class Category
 {
 	public function __construct(
@@ -21,20 +23,22 @@ final readonly class Category
 	/** @param array<string,mixed> $row */
 	public static function fromArray(array $row, ?array $groupContext = null): ?self
 	{
-		$id = trim((string) ($row['id'] ?? ''));
-		if ($id === '') {
+		$id = ArrayReader::requiredString($row, 'id');
+		if ($id === null) {
 			return null;
 		}
+
+		$ctx = $groupContext ?? [];
 
 		return new self(
 			id: $id,
 			name: (string) ($row['name'] ?? ''),
-			groupId: (string) ($groupContext['groupId'] ?? ''),
-			groupName: (string) ($groupContext['groupName'] ?? ''),
-			groupOrder: (int) ($groupContext['groupOrder'] ?? 0),
-			categoryOrder: (int) ($groupContext['categoryOrder'] ?? 0),
-			hidden: (bool) ($row['hidden'] ?? false),
-			deleted: (bool) ($row['deleted'] ?? false),
+			groupId: (string) ($ctx['groupId'] ?? ''),
+			groupName: (string) ($ctx['groupName'] ?? ''),
+			groupOrder: ArrayReader::int($ctx, 'groupOrder'),
+			categoryOrder: ArrayReader::int($ctx, 'categoryOrder'),
+			hidden: ArrayReader::bool($row, 'hidden'),
+			deleted: ArrayReader::bool($row, 'deleted'),
 		);
 	}
 }

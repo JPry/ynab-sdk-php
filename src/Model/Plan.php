@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model;
 
+use JPry\YNAB\Internal\ArrayReader;
+
 final readonly class Plan
 {
 	/**
@@ -26,19 +28,19 @@ final readonly class Plan
 	/** @param array<string,mixed> $row */
 	public static function fromArray(array $row): ?self
 	{
-		$id = trim((string) ($row['id'] ?? ''));
-		if ($id === '') {
+		$id = ArrayReader::requiredString($row, 'id');
+		if ($id === null) {
 			return null;
 		}
 
 		return new self(
 			id: $id,
 			name: (string) ($row['name'] ?? 'Unnamed'),
-			lastModifiedOn: isset($row['last_modified_on']) ? (string) $row['last_modified_on'] : null,
-			firstMonth: isset($row['first_month']) ? (string) $row['first_month'] : null,
-			lastMonth: isset($row['last_month']) ? (string) $row['last_month'] : null,
-			dateFormat: isset($row['date_format']) && is_array($row['date_format']) ? $row['date_format'] : null,
-			currencyFormat: isset($row['currency_format']) && is_array($row['currency_format']) ? $row['currency_format'] : null,
+			lastModifiedOn: ArrayReader::nullableString($row, 'last_modified_on'),
+			firstMonth: ArrayReader::nullableString($row, 'first_month'),
+			lastMonth: ArrayReader::nullableString($row, 'last_month'),
+			dateFormat: ArrayReader::nullableArray($row, 'date_format'),
+			currencyFormat: ArrayReader::nullableArray($row, 'currency_format'),
 			raw: $row,
 		);
 	}

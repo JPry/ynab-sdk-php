@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model;
 
+use JPry\YNAB\Internal\ArrayReader;
+
 final readonly class Account
 {
 	/** @param array<string,mixed> $raw */
@@ -30,29 +32,27 @@ final readonly class Account
 	/** @param array<string,mixed> $row */
 	public static function fromArray(array $row): ?self
 	{
-		$id = trim((string) ($row['id'] ?? ''));
-		if ($id === '') {
+		$id = ArrayReader::requiredString($row, 'id');
+		if ($id === null) {
 			return null;
 		}
-
-		$transferPayeeId = isset($row['transfer_payee_id']) ? trim((string) $row['transfer_payee_id']) : null;
 
 		return new self(
 			id: $id,
 			name: (string) ($row['name'] ?? ''),
 			type: (string) ($row['type'] ?? ''),
-			closed: (bool) ($row['closed'] ?? false),
-			balance: (int) ($row['balance'] ?? 0),
-			clearedBalance: (int) ($row['cleared_balance'] ?? 0),
-			unclearedBalance: (int) ($row['uncleared_balance'] ?? 0),
-			onBudget: (bool) ($row['on_budget'] ?? false),
-			deleted: (bool) ($row['deleted'] ?? false),
-			note: isset($row['note']) ? (string) $row['note'] : null,
-			transferPayeeId: $transferPayeeId !== '' ? $transferPayeeId : null,
-			directImportLinked: array_key_exists('direct_import_linked', $row) ? (bool) $row['direct_import_linked'] : null,
-			directImportInError: array_key_exists('direct_import_in_error', $row) ? (bool) $row['direct_import_in_error'] : null,
-			lastReconciledAt: isset($row['last_reconciled_at']) ? (string) $row['last_reconciled_at'] : null,
-			debtOriginalBalance: array_key_exists('debt_original_balance', $row) && $row['debt_original_balance'] !== null ? (int) $row['debt_original_balance'] : null,
+			closed: ArrayReader::bool($row, 'closed'),
+			balance: ArrayReader::int($row, 'balance'),
+			clearedBalance: ArrayReader::int($row, 'cleared_balance'),
+			unclearedBalance: ArrayReader::int($row, 'uncleared_balance'),
+			onBudget: ArrayReader::bool($row, 'on_budget'),
+			deleted: ArrayReader::bool($row, 'deleted'),
+			note: ArrayReader::nullableString($row, 'note'),
+			transferPayeeId: ArrayReader::nullableNonEmptyString($row, 'transfer_payee_id'),
+			directImportLinked: ArrayReader::nullableBool($row, 'direct_import_linked'),
+			directImportInError: ArrayReader::nullableBool($row, 'direct_import_in_error'),
+			lastReconciledAt: ArrayReader::nullableString($row, 'last_reconciled_at'),
+			debtOriginalBalance: ArrayReader::nullableInt($row, 'debt_original_balance'),
 			raw: $row,
 		);
 	}

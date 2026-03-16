@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model;
 
+use JPry\YNAB\Internal\ArrayReader;
+
 final readonly class MoneyMovement
 {
 	public function __construct(
@@ -22,21 +24,21 @@ final readonly class MoneyMovement
 	/** @param array<string,mixed> $row */
 	public static function fromArray(array $row): ?self
 	{
-		$id = trim((string) ($row['id'] ?? ''));
-		if ($id === '') {
+		$id = ArrayReader::requiredString($row, 'id');
+		if ($id === null) {
 			return null;
 		}
 
 		return new self(
 			id: $id,
-			month: isset($row['month']) ? (string) $row['month'] : null,
-			movedAt: isset($row['moved_at']) ? (string) $row['moved_at'] : null,
-			note: isset($row['note']) ? (string) $row['note'] : null,
-			moneyMovementGroupId: isset($row['money_movement_group_id']) ? (string) $row['money_movement_group_id'] : null,
-			performedByUserId: isset($row['performed_by_user_id']) ? (string) $row['performed_by_user_id'] : null,
-			fromCategoryId: isset($row['from_category_id']) ? (string) $row['from_category_id'] : null,
-			toCategoryId: isset($row['to_category_id']) ? (string) $row['to_category_id'] : null,
-			amount: (int) ($row['amount'] ?? 0),
+			month: ArrayReader::nullableString($row, 'month'),
+			movedAt: ArrayReader::nullableString($row, 'moved_at'),
+			note: ArrayReader::nullableString($row, 'note'),
+			moneyMovementGroupId: ArrayReader::nullableString($row, 'money_movement_group_id'),
+			performedByUserId: ArrayReader::nullableString($row, 'performed_by_user_id'),
+			fromCategoryId: ArrayReader::nullableString($row, 'from_category_id'),
+			toCategoryId: ArrayReader::nullableString($row, 'to_category_id'),
+			amount: ArrayReader::int($row, 'amount'),
 		);
 	}
 }

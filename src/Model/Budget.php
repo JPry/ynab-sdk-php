@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model;
 
+use JPry\YNAB\Internal\ArrayReader;
 use JPry\YNAB\Internal\BudgetDeprecationWarningTrait;
 
 /**
@@ -22,8 +23,8 @@ final readonly class Budget
 	/** @param array<string,mixed> $row */
 	public static function fromArray(array $row): ?self
 	{
-		$id = trim((string) ($row['id'] ?? ''));
-		if ($id === '') {
+		$id = ArrayReader::requiredString($row, 'id');
+		if ($id === null) {
 			return null;
 		}
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model;
 
+use JPry\YNAB\Internal\ArrayReader;
+
 final readonly class PayeeLocation
 {
 	public function __construct(
@@ -18,8 +20,8 @@ final readonly class PayeeLocation
 	/** @param array<string,mixed> $row */
 	public static function fromArray(array $row): ?self
 	{
-		$id = trim((string) ($row['id'] ?? ''));
-		if ($id === '') {
+		$id = ArrayReader::requiredString($row, 'id');
+		if ($id === null) {
 			return null;
 		}
 
@@ -28,7 +30,7 @@ final readonly class PayeeLocation
 			payeeId: (string) ($row['payee_id'] ?? ''),
 			latitude: (string) ($row['latitude'] ?? ''),
 			longitude: (string) ($row['longitude'] ?? ''),
-			deleted: (bool) ($row['deleted'] ?? false),
+			deleted: ArrayReader::bool($row, 'deleted'),
 		);
 	}
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model;
 
+use JPry\YNAB\Internal\ArrayReader;
+
 final readonly class CategoryGroup
 {
 	public function __construct(
@@ -17,16 +19,16 @@ final readonly class CategoryGroup
 	/** @param array<string,mixed> $row */
 	public static function fromArray(array $row): ?self
 	{
-		$id = trim((string) ($row['id'] ?? ''));
-		if ($id === '') {
+		$id = ArrayReader::requiredString($row, 'id');
+		if ($id === null) {
 			return null;
 		}
 
 		return new self(
 			id: $id,
 			name: (string) ($row['name'] ?? ''),
-			hidden: (bool) ($row['hidden'] ?? false),
-			deleted: (bool) ($row['deleted'] ?? false),
+			hidden: ArrayReader::bool($row, 'hidden'),
+			deleted: ArrayReader::bool($row, 'deleted'),
 		);
 	}
 }

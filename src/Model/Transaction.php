@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model;
 
+use JPry\YNAB\Internal\ArrayReader;
+
 final readonly class Transaction
 {
 	/** @param array<string,mixed> $raw */
@@ -25,22 +27,22 @@ final readonly class Transaction
 	/** @param array<string,mixed> $row */
 	public static function fromArray(array $row): ?self
 	{
-		$id = trim((string) ($row['id'] ?? ''));
-		if ($id === '') {
+		$id = ArrayReader::requiredString($row, 'id');
+		if ($id === null) {
 			return null;
 		}
 
 		return new self(
 			id: $id,
 			accountId: (string) ($row['account_id'] ?? ''),
-			date: isset($row['date']) ? (string) $row['date'] : null,
-			amount: (int) ($row['amount'] ?? 0),
-			payeeName: isset($row['payee_name']) ? (string) $row['payee_name'] : null,
-			payeeId: isset($row['payee_id']) ? (string) $row['payee_id'] : null,
-			memo: isset($row['memo']) ? (string) $row['memo'] : null,
-			cleared: isset($row['cleared']) ? (string) $row['cleared'] : null,
-			approved: array_key_exists('approved', $row) ? (bool) $row['approved'] : null,
-			categoryId: isset($row['category_id']) ? (string) $row['category_id'] : null,
+			date: ArrayReader::nullableString($row, 'date'),
+			amount: ArrayReader::int($row, 'amount'),
+			payeeName: ArrayReader::nullableString($row, 'payee_name'),
+			payeeId: ArrayReader::nullableString($row, 'payee_id'),
+			memo: ArrayReader::nullableString($row, 'memo'),
+			cleared: ArrayReader::nullableString($row, 'cleared'),
+			approved: ArrayReader::nullableBool($row, 'approved'),
+			categoryId: ArrayReader::nullableString($row, 'category_id'),
 			raw: $row,
 		);
 	}

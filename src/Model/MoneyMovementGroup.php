@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model;
 
+use JPry\YNAB\Internal\ArrayReader;
+
 final readonly class MoneyMovementGroup
 {
 	public function __construct(
@@ -18,8 +20,8 @@ final readonly class MoneyMovementGroup
 	/** @param array<string,mixed> $row */
 	public static function fromArray(array $row): ?self
 	{
-		$id = trim((string) ($row['id'] ?? ''));
-		if ($id === '') {
+		$id = ArrayReader::requiredString($row, 'id');
+		if ($id === null) {
 			return null;
 		}
 
@@ -27,8 +29,8 @@ final readonly class MoneyMovementGroup
 			id: $id,
 			groupCreatedAt: (string) ($row['group_created_at'] ?? ''),
 			month: (string) ($row['month'] ?? ''),
-			note: isset($row['note']) ? (string) $row['note'] : null,
-			performedByUserId: isset($row['performed_by_user_id']) ? (string) $row['performed_by_user_id'] : null,
+			note: ArrayReader::nullableString($row, 'note'),
+			performedByUserId: ArrayReader::nullableString($row, 'performed_by_user_id'),
 		);
 	}
 }
