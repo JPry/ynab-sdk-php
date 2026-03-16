@@ -8,7 +8,7 @@ use InvalidArgumentException;
 
 class InvalidStringException extends InvalidArgumentException
 {
-	static public function forEmptyString(string $name): self
+	public static function forEmptyString(string $name): self
 	{
 		return new self("The string '{$name}' cannot be empty.");
 	}

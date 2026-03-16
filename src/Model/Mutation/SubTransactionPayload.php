@@ -24,7 +24,7 @@ final readonly class SubTransactionPayload implements RequestModel
 			'payee_name' => $this->payeeName,
 			'category_id' => $this->categoryId,
 			'memo' => $this->memo,
-		], fn($v) => $v !== null);
+		], fn ($v) => $v !== null);
 
 		return array_merge($required, $optional);
 	}

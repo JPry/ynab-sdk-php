@@ -23,7 +23,7 @@ final readonly class UpdatePayeeRequest implements RequestModel, Model
 		return [
 			'payee' => array_filter([
 				'name' => $this->name,
-			], fn($v) => $v !== null),
+			], fn ($v) => $v !== null),
 		];
 	}
 }

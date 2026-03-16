@@ -19,7 +19,7 @@ final readonly class PatchTransactionPayload implements RequestModel
 		$optional = array_filter([
 			'id' => $this->id,
 			'import_id' => $this->importId,
-		], fn($v) => $v !== null);
+		], fn ($v) => $v !== null);
 
 		return array_merge($this->transaction->toArray(), $optional);
 	}

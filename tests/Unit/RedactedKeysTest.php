@@ -10,7 +10,7 @@ use JPry\YNAB\OAuth\OAuthTokens;
 
 it(
 	'Prevents ApiKeyAuth::apiKey property from being shown in var_dump()',
-	function() {
+	function () {
 		$apiKey = 'foobar123';
 		$auth = new ApiKeyAuth($apiKey);
 
@@ -26,7 +26,7 @@ it(
 
 it(
 	'Prevents ApiKeyAuth::apiKey property from being shown in print_r()',
-	function() {
+	function () {
 		$apiKey = 'foobar123';
 		$auth = new ApiKeyAuth($apiKey);
 
@@ -40,9 +40,9 @@ it(
 
 it(
 	'Redacts tokens from OAuthTokenAuth when using var_dump()',
-	function() {
+	function () {
 		$accessToken = 'access123';
-		$refreshToken = static fn() => 'refresh123';
+		$refreshToken = static fn () => 'refresh123';
 
 		// Test without the refresh token first.
 		$auth = new OAuthTokenAuth($accessToken);
@@ -70,9 +70,9 @@ it(
 
 it(
 	'Redacts tokens from OAuthTokenAuth when using print_r()',
-	function() {
+	function () {
 		$accessToken = 'access123';
-		$refreshToken = static fn() => 'refresh123';
+		$refreshToken = static fn () => 'refresh123';
 
 		// Test without the refresh token first.
 		$auth = new OAuthTokenAuth($accessToken);
@@ -94,7 +94,7 @@ it(
 
 it(
 	'Redacts client credentials from OAuthConfig when using var_dump()',
-	function() {
+	function () {
 		$clientId = 'client-123';
 		$clientSecret = 'secret-456';
 		$callbackUrl = 'https://example.com/callback';
@@ -119,7 +119,7 @@ it(
 
 it(
 	'Redacts client credentials from OAuthConfig when using print_r()',
-	function() {
+	function () {
 		$clientId = 'client-123';
 		$clientSecret = 'secret-456';
 		$callbackUrl = 'https://example.com/callback';
@@ -142,7 +142,7 @@ it(
 
 it(
 	'Redacts tokens from OAuthTokens when using var_dump()',
-	function() {
+	function () {
 		$accessToken = 'access-123';
 		$refreshToken = 'refresh-456';
 
@@ -161,7 +161,7 @@ it(
 
 it(
 	'Redacts tokens from OAuthTokens when using print_r()',
-	function() {
+	function () {
 		$accessToken = 'access-123';
 		$refreshToken = 'refresh-456';
 
@@ -178,43 +178,43 @@ it(
 
 it(
 	'Throws InvalidStringException when ApiKeyAuth is constructed with an empty string',
-	function() {
-		expect(fn() => new ApiKeyAuth(''))->toThrow(InvalidStringException::class);
+	function () {
+		expect(fn () => new ApiKeyAuth(''))->toThrow(InvalidStringException::class);
 	}
 );
 
 it(
 	'Throws InvalidStringException when ApiKeyAuth is constructed with a whitespace-only string',
-	function() {
-		expect(fn() => new ApiKeyAuth('   '))->toThrow(InvalidStringException::class);
-		expect(fn() => new ApiKeyAuth("\t"))->toThrow(InvalidStringException::class);
-		expect(fn() => new ApiKeyAuth("\n"))->toThrow(InvalidStringException::class);
+	function () {
+		expect(fn () => new ApiKeyAuth('   '))->toThrow(InvalidStringException::class);
+		expect(fn () => new ApiKeyAuth("\t"))->toThrow(InvalidStringException::class);
+		expect(fn () => new ApiKeyAuth("\n"))->toThrow(InvalidStringException::class);
 	}
 );
 
 it(
 	'Throws InvalidStringException when OAuthTokenAuth is constructed with an empty access token',
-	function() {
-		expect(fn() => new OAuthTokenAuth(''))->toThrow(InvalidStringException::class);
+	function () {
+		expect(fn () => new OAuthTokenAuth(''))->toThrow(InvalidStringException::class);
 	}
 );
 
 it(
 	'Throws InvalidStringException when OAuthTokenAuth is constructed with a whitespace-only access token',
-	function() {
-		expect(fn() => new OAuthTokenAuth('   '))->toThrow(InvalidStringException::class);
-		expect(fn() => new OAuthTokenAuth("\t"))->toThrow(InvalidStringException::class);
-		expect(fn() => new OAuthTokenAuth("\n"))->toThrow(InvalidStringException::class);
+	function () {
+		expect(fn () => new OAuthTokenAuth('   '))->toThrow(InvalidStringException::class);
+		expect(fn () => new OAuthTokenAuth("\t"))->toThrow(InvalidStringException::class);
+		expect(fn () => new OAuthTokenAuth("\n"))->toThrow(InvalidStringException::class);
 	}
 );
 
 it(
 	'Accepts a valid access token with an optional refresh callable in OAuthTokenAuth',
-	function() {
+	function () {
 		$auth = new OAuthTokenAuth('valid-token');
 		expect($auth)->toBeInstanceOf(OAuthTokenAuth::class);
 
-		$authWithRefresh = new OAuthTokenAuth('valid-token', fn() => 'new-token');
+		$authWithRefresh = new OAuthTokenAuth('valid-token', fn () => 'new-token');
 		expect($authWithRefresh)->toBeInstanceOf(OAuthTokenAuth::class);
 	}
 );

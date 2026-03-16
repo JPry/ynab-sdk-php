@@ -37,7 +37,7 @@ final readonly class ScheduledTransactionPayload implements RequestModel
 			'memo' => $this->memo,
 			'flag_color' => $this->flagColor?->value,
 			'frequency' => $this->frequency?->value,
-		], fn($v) => $v !== null);
+		], fn ($v) => $v !== null);
 
 		return array_merge($required, $optional);
 	}

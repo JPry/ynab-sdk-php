@@ -41,7 +41,7 @@ final readonly class TransactionPayload implements RequestModel
 			'approved' => $this->approved,
 			'flag_color' => $this->flagColor?->value,
 			'import_id' => $this->importId,
-		], fn($v) => $v !== null);
+		], fn ($v) => $v !== null);
 
 		if ($this->subtransactions !== []) {
 			$data['subtransactions'] = array_map(

@@ -37,7 +37,8 @@ final readonly class OAuthTokens
 		);
 	}
 
-	public function __debugInfo(): ?array {
+	public function __debugInfo(): ?array
+	{
 		return [
 			'accessToken' => 'REDACTED access token',
 			'refreshToken' => 'REDACTED refresh token',

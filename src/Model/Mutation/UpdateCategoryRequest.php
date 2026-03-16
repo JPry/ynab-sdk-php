@@ -31,7 +31,7 @@ final readonly class UpdateCategoryRequest implements RequestModel, Model
 				'category_group_id' => $this->categoryGroupId,
 				'goal_target' => $this->goalTarget,
 				'goal_target_date' => $this->goalTargetDate,
-			], fn($v) => $v !== null),
+			], fn ($v) => $v !== null),
 		];
 	}
 }

@@ -26,7 +26,7 @@ final readonly class CreateCategoryRequest implements RequestModel
 			'note' => $this->note,
 			'goal_target' => $this->goalTarget,
 			'goal_target_date' => $this->goalTargetDate,
-		], fn($v) => $v !== null);
+		], fn ($v) => $v !== null);
 
 		return [
 			'category' => array_merge($required, $optional),

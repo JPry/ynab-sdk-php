@@ -8,12 +8,12 @@ use JPry\YNAB\Exception\InvalidStringException;
 
 it(
 	'Throws an InvalidStringException when the apiKey/accessToken is empty',
-	function() {
-		expect(function() {
+	function () {
+		expect(function () {
 			new ApiKeyAuth('');
 		})->toThrow(InvalidStringException::class);
 
-		expect(function() {
+		expect(function () {
 			new OAuthTokenAuth('');
 		})->toThrow(InvalidStringException::class);
 	}
@@ -21,12 +21,12 @@ it(
 
 it(
 	'Throws an InvalidStringExeption when the the trimmed apiKey/accessToken is empty',
-	function() {
-		expect(function() {
+	function () {
+		expect(function () {
 			new ApiKeyAuth('   ');
 		})->toThrow(InvalidStringException::class);
 
-		expect(function() {
+		expect(function () {
 			new OAuthTokenAuth('   ');
 		})->toThrow(InvalidStringException::class);
 	}
