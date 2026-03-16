@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use JPry\YNAB\Client\YnabClient;
 use JPry\YNAB\Exception\YnabApiException;
+use JPry\YNAB\Exception\YnabException;
 use JPry\YNAB\Model\Mutation\CreateAccountRequest;
 use JPry\YNAB\Model\Mutation\CreateCategoryGroupRequest;
 use JPry\YNAB\Model\Mutation\CreateCategoryRequest;
@@ -415,4 +416,73 @@ it('keeps legacy mutating signatures compatible with v1.0.0', function () {
 
 	expect($sender->requests[2]->getMethod())->toBe('DELETE');
 	expect($sender->requests[2]->getUri()->getPath())->toEndWith('/plans/P1/transactions/T1');
+});
+
+// TEST-06: accounts() and payees() collection endpoint tests
+
+it('retrieves accounts collection with all fields populated', function () {
+	$sender = new ArrayRequestSender([
+		fn ($request) => new Response(200, [], '{"data":{"accounts":[{"id":"A1","name":"Checking","type":"checking","on_budget":true,"closed":false,"balance":100000,"cleared_balance":90000,"uncleared_balance":10000,"deleted":false}],"server_knowledge":5}}'),
+	]);
+
+	$client = YnabClient::withApiKey('api-key-123', requestSender: $sender);
+
+	$accounts = $client->accounts('P1');
+
+	expect($accounts->items)->toHaveCount(1);
+	expect($accounts->serverKnowledge)->toBe(5);
+
+	$account = $accounts->items[0];
+	expect($account?->id)->toBe('A1');
+	expect($account?->name)->toBe('Checking');
+	expect($account?->type)->toBe('checking');
+	expect($account?->onBudget)->toBeTrue();
+	expect($account?->closed)->toBeFalse();
+	expect($account?->balance)->toBe(100000);
+	expect($account?->clearedBalance)->toBe(90000);
+	expect($account?->unclearedBalance)->toBe(10000);
+	expect($account?->deleted)->toBeFalse();
+
+	expect($sender->requests[0]->getUri()->getPath())->toEndWith('/plans/P1/accounts');
+});
+
+it('retrieves payees collection with all fields populated', function () {
+	$sender = new ArrayRequestSender([
+		fn ($request) => new Response(200, [], '{"data":{"payees":[{"id":"PY1","name":"Grocery Store","transfer_account_id":null,"deleted":false}],"server_knowledge":3}}'),
+	]);
+
+	$client = YnabClient::withApiKey('api-key-123', requestSender: $sender);
+
+	$payees = $client->payees('P1');
+
+	expect($payees->items)->toHaveCount(1);
+	expect($payees->serverKnowledge)->toBe(3);
+
+	$payee = $payees->items[0];
+	expect($payee?->id)->toBe('PY1');
+	expect($payee?->name)->toBe('Grocery Store');
+	expect($payee?->transferAccountId)->toBeNull();
+	expect($payee?->deleted)->toBeFalse();
+
+	expect($sender->requests[0]->getUri()->getPath())->toEndWith('/plans/P1/payees');
+});
+
+// TEST-07: updateTransaction() error path tests
+
+it('throws YnabException when a RequestModel is passed alongside a non-null payload', function () {
+	$sender = new ArrayRequestSender([]);
+	$client = YnabClient::withApiKey('api-key-123', requestSender: $sender);
+
+	expect(fn () => $client->updateTransaction(
+		'P1',
+		new UpdateTransactionRequest('T1', new TransactionPayload(memo: 'Updated')),
+		['transaction' => ['memo' => 'Should not be here']],
+	))->toThrow(YnabException::class);
+});
+
+it('throws YnabException when a string ID is passed without a payload', function () {
+	$sender = new ArrayRequestSender([]);
+	$client = YnabClient::withApiKey('api-key-123', requestSender: $sender);
+
+	expect(fn () => $client->updateTransaction('P1', 'T1'))->toThrow(YnabException::class);
 });
