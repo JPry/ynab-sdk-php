@@ -6,11 +6,16 @@ namespace JPry\YNAB\Model;
 
 use JPry\YNAB\Internal\ArrayReader;
 
-final readonly class User
+final readonly class User implements Model
 {
 	public function __construct(
 		public string $id,
 	) {
+	}
+
+	public function getId(): string
+	{
+		return $this->id;
 	}
 
 	/** @param array<string,mixed> $row */

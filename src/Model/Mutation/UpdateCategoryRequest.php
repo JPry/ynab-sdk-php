@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model\Mutation;
 
-final readonly class UpdateCategoryRequest implements RequestModel
+use JPry\YNAB\Model\Model;
+
+final readonly class UpdateCategoryRequest implements RequestModel, Model
 {
 	public function __construct(
 		public string $id,
@@ -14,6 +16,11 @@ final readonly class UpdateCategoryRequest implements RequestModel
 		public ?int $goalTarget = null,
 		public ?string $goalTargetDate = null,
 	) {
+	}
+
+	public function getId(): string
+	{
+		return $this->id;
 	}
 
 	/** @return array<string,mixed> */

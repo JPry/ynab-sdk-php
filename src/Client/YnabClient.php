@@ -35,6 +35,7 @@ use JPry\YNAB\Model\Mutation\UpdateMonthCategoryRequest;
 use JPry\YNAB\Model\Mutation\UpdatePayeeRequest;
 use JPry\YNAB\Model\Mutation\UpdateScheduledTransactionRequest;
 use JPry\YNAB\Model\Mutation\UpdateTransactionRequest;
+use JPry\YNAB\Model\Model;
 use JPry\YNAB\Model\MoneyMovement;
 use JPry\YNAB\Model\MoneyMovementGroup;
 use JPry\YNAB\Model\Payee;
@@ -371,10 +372,10 @@ final readonly class YnabClient
 	}
 
 	/**
-	 * @param string|Transaction|UpdateTransactionRequest $transactionId
+	 * @param string|Model $transactionId A transaction ID string, or a Transaction or UpdateTransactionRequest instance
 	 * @return array<string,mixed>
 	 */
-	public function deleteTransaction(string $planId, string|Transaction|UpdateTransactionRequest $transactionId): array
+	public function deleteTransaction(string $planId, string|Model $transactionId): array
 	{
 		return $this->request('DELETE', "/plans/{$planId}/transactions/{$this->resolveModelId($transactionId)}", [], null);
 	}
@@ -399,10 +400,10 @@ final readonly class YnabClient
 	}
 
 	/**
-	 * @param string|ScheduledTransaction|UpdateScheduledTransactionRequest $scheduledTransactionId
+	 * @param string|Model $scheduledTransactionId A scheduled transaction ID string, or a ScheduledTransaction or UpdateScheduledTransactionRequest instance
 	 * @return array<string,mixed>
 	 */
-	public function deleteScheduledTransaction(string $planId, string|ScheduledTransaction|UpdateScheduledTransactionRequest $scheduledTransactionId): array
+	public function deleteScheduledTransaction(string $planId, string|Model $scheduledTransactionId): array
 	{
 		return $this->request('DELETE', "/plans/{$planId}/scheduled_transactions/{$this->resolveModelId($scheduledTransactionId)}", [], null);
 	}
@@ -538,16 +539,9 @@ final readonly class YnabClient
 		return $this->request($httpMethod, "{$basePath}/{$idOrModel}", [], $payload);
 	}
 
-	/**
-	 * @param object{id:string}|string $idCarrier
-	 */
-	private function resolveModelId(string|object $idCarrier): string
+	private function resolveModelId(Model|string $idCarrier): string
 	{
-		$id = is_string($idCarrier) ? $idCarrier : ($idCarrier->id ?? null);
-		if (!is_string($id)) {
-			throw new YnabException('Expected a string ID or model instance with a string $id property.');
-		}
-
+		$id = is_string($idCarrier) ? $idCarrier : $idCarrier->getId();
 		$id = trim($id);
 		if ($id === '') {
 			throw new YnabException('Model ID cannot be empty.');

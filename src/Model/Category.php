@@ -6,7 +6,7 @@ namespace JPry\YNAB\Model;
 
 use JPry\YNAB\Internal\ArrayReader;
 
-final readonly class Category
+final readonly class Category implements Model
 {
 	public function __construct(
 		public string $id,
@@ -18,6 +18,11 @@ final readonly class Category
 		public bool $hidden,
 		public bool $deleted,
 	) {
+	}
+
+	public function getId(): string
+	{
+		return $this->id;
 	}
 
 	/** @param array<string,mixed> $row */

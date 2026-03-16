@@ -10,7 +10,7 @@ use JPry\YNAB\Internal\BudgetDeprecationWarningTrait;
 /**
  * @deprecated YNAB API v1.79.0 renamed budgets to plans. Use Plan instead.
  */
-final readonly class Budget
+final readonly class Budget implements Model
 {
 	use BudgetDeprecationWarningTrait;
 
@@ -18,6 +18,11 @@ final readonly class Budget
 		public string $id,
 		public string $name,
 	) {
+	}
+
+	public function getId(): string
+	{
+		return $this->id;
 	}
 
 	/** @param array<string,mixed> $row */

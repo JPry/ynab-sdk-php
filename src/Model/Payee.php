@@ -6,7 +6,7 @@ namespace JPry\YNAB\Model;
 
 use JPry\YNAB\Internal\ArrayReader;
 
-final readonly class Payee
+final readonly class Payee implements Model
 {
 	public function __construct(
 		public string $id,
@@ -14,6 +14,11 @@ final readonly class Payee
 		public ?string $transferAccountId,
 		public bool $deleted,
 	) {
+	}
+
+	public function getId(): string
+	{
+		return $this->id;
 	}
 
 	/** @param array<string,mixed> $row */

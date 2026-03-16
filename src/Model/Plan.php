@@ -6,7 +6,7 @@ namespace JPry\YNAB\Model;
 
 use JPry\YNAB\Internal\ArrayReader;
 
-final readonly class Plan
+final readonly class Plan implements Model
 {
 	/**
 	 * @param array<string,mixed>|null $dateFormat
@@ -23,6 +23,11 @@ final readonly class Plan
 		public ?array $currencyFormat,
 		public array $raw,
 	) {
+	}
+
+	public function getId(): string
+	{
+		return $this->id;
 	}
 
 	/** @param array<string,mixed> $row */
