@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model\Mutation;
 
+use JPry\YNAB\Internal\HasId;
 use JPry\YNAB\Model\Model;
 
 final readonly class UpdateCategoryRequest implements RequestModel, Model
 {
+	use HasId;
+
 	public function __construct(
 		public string $id,
 		public ?string $name = null,
@@ -16,11 +19,6 @@ final readonly class UpdateCategoryRequest implements RequestModel, Model
 		public ?int $goalTarget = null,
 		public ?string $goalTargetDate = null,
 	) {
-	}
-
-	public function getId(): string
-	{
-		return $this->id;
 	}
 
 	/** @return array<string,mixed> */

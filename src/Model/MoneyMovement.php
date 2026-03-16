@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace JPry\YNAB\Model;
 
 use JPry\YNAB\Internal\ArrayReader;
+use JPry\YNAB\Internal\HasId;
 
 final readonly class MoneyMovement implements Model
 {
+	use HasId;
+
 	public function __construct(
 		public string $id,
 		public ?string $month,
@@ -19,11 +22,6 @@ final readonly class MoneyMovement implements Model
 		public ?string $toCategoryId,
 		public int $amount,
 	) {
-	}
-
-	public function getId(): string
-	{
-		return $this->id;
 	}
 
 	/** @param array<string,mixed> $row */

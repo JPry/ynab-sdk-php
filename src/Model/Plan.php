@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace JPry\YNAB\Model;
 
 use JPry\YNAB\Internal\ArrayReader;
+use JPry\YNAB\Internal\HasId;
 
 final readonly class Plan implements Model
 {
+	use HasId;
+
 	/**
 	 * @param array<string,mixed>|null $dateFormat
 	 * @param array<string,mixed>|null $currencyFormat
@@ -23,11 +26,6 @@ final readonly class Plan implements Model
 		public ?array $currencyFormat,
 		public array $raw,
 	) {
-	}
-
-	public function getId(): string
-	{
-		return $this->id;
 	}
 
 	/** @param array<string,mixed> $row */

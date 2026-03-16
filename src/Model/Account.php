@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace JPry\YNAB\Model;
 
 use JPry\YNAB\Internal\ArrayReader;
+use JPry\YNAB\Internal\HasId;
 
 final readonly class Account implements Model
 {
+	use HasId;
+
 	/** @param array<string,mixed> $raw */
 	public function __construct(
 		public string $id,
@@ -27,11 +30,6 @@ final readonly class Account implements Model
 		public ?int $debtOriginalBalance,
 		public array $raw,
 	) {
-	}
-
-	public function getId(): string
-	{
-		return $this->id;
 	}
 
 	/** @param array<string,mixed> $row */
