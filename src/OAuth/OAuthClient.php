@@ -16,6 +16,11 @@ final readonly class OAuthClient
 	) {
 	}
 
+	public static function generateState(int $bytes = 32): string
+	{
+		return bin2hex(random_bytes($bytes));
+	}
+
 	public function authorizationUrl(string $state): string
 	{
 		$query = http_build_query([
