@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model\Mutation;
 
+use JPry\YNAB\Model\Enum\TransactionClearedStatus;
+use JPry\YNAB\Model\Enum\TransactionFlagColor;
+
 final readonly class TransactionPayload implements RequestModel
 {
 	/** @param list<SubTransactionPayload> $subtransactions */
@@ -15,9 +18,9 @@ final readonly class TransactionPayload implements RequestModel
 		public ?string $payeeName = null,
 		public ?string $categoryId = null,
 		public ?string $memo = null,
-		public ?string $cleared = null,
+		public ?TransactionClearedStatus $cleared = null,
 		public ?bool $approved = null,
-		public ?string $flagColor = null,
+		public ?TransactionFlagColor $flagColor = null,
 		public array $subtransactions = [],
 		public ?string $importId = null,
 	) {
@@ -34,9 +37,9 @@ final readonly class TransactionPayload implements RequestModel
 			'payee_name' => $this->payeeName,
 			'category_id' => $this->categoryId,
 			'memo' => $this->memo,
-			'cleared' => $this->cleared,
+			'cleared' => $this->cleared?->value,
 			'approved' => $this->approved,
-			'flag_color' => $this->flagColor,
+			'flag_color' => $this->flagColor?->value,
 			'import_id' => $this->importId,
 		], fn($v) => $v !== null);
 

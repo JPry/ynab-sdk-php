@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model\Mutation;
 
+use JPry\YNAB\Model\Enum\AccountType;
+
 final readonly class CreateAccountRequest implements RequestModel
 {
 	public function __construct(
 		public string $name,
-		public string $type,
+		public AccountType $type,
 		public int $balance,
 	) {
 	}
@@ -19,7 +21,7 @@ final readonly class CreateAccountRequest implements RequestModel
 		return [
 			'account' => [
 				'name' => $this->name,
-				'type' => $this->type,
+				'type' => $this->type->value,
 				'balance' => $this->balance,
 			],
 		];

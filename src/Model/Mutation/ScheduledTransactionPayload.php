@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model\Mutation;
 
+use JPry\YNAB\Model\Enum\ScheduledTransactionFrequency;
+use JPry\YNAB\Model\Enum\TransactionFlagColor;
+
 final readonly class ScheduledTransactionPayload implements RequestModel
 {
 	public function __construct(
@@ -14,8 +17,8 @@ final readonly class ScheduledTransactionPayload implements RequestModel
 		public ?string $payeeName = null,
 		public ?string $categoryId = null,
 		public ?string $memo = null,
-		public ?string $flagColor = null,
-		public ?string $frequency = null,
+		public ?TransactionFlagColor $flagColor = null,
+		public ?ScheduledTransactionFrequency $frequency = null,
 	) {
 	}
 
@@ -32,8 +35,8 @@ final readonly class ScheduledTransactionPayload implements RequestModel
 			'payee_name' => $this->payeeName,
 			'category_id' => $this->categoryId,
 			'memo' => $this->memo,
-			'flag_color' => $this->flagColor,
-			'frequency' => $this->frequency,
+			'flag_color' => $this->flagColor?->value,
+			'frequency' => $this->frequency?->value,
 		], fn($v) => $v !== null);
 
 		return array_merge($required, $optional);

@@ -13,6 +13,10 @@ use JPry\YNAB\Model\Mutation\PatchTransactionsRequest;
 use JPry\YNAB\Model\Mutation\ScheduledTransactionPayload;
 use JPry\YNAB\Model\Mutation\SubTransactionPayload;
 use JPry\YNAB\Model\Mutation\TransactionPayload;
+use JPry\YNAB\Model\Enum\AccountType;
+use JPry\YNAB\Model\Enum\ScheduledTransactionFrequency;
+use JPry\YNAB\Model\Enum\TransactionClearedStatus;
+use JPry\YNAB\Model\Enum\TransactionFlagColor;
 use JPry\YNAB\Model\Mutation\UpdateCategoryGroupRequest;
 use JPry\YNAB\Model\Mutation\UpdateCategoryRequest;
 use JPry\YNAB\Model\Mutation\UpdateMonthCategoryRequest;
@@ -67,9 +71,9 @@ it('TransactionPayload toArray() includes all populated fields with snake_case k
 		payeeName: 'Coffee Shop',
 		categoryId: 'C1',
 		memo: 'Morning coffee',
-		cleared: 'cleared',
+		cleared: TransactionClearedStatus::Cleared,
 		approved: true,
-		flagColor: 'red',
+		flagColor: TransactionFlagColor::Red,
 		subtransactions: [],
 		importId: 'IMPORT-001',
 	);
@@ -149,8 +153,8 @@ it('ScheduledTransactionPayload toArray() includes all populated optional fields
 		payeeName: 'Landlord',
 		categoryId: 'C2',
 		memo: 'Monthly rent',
-		flagColor: 'blue',
-		frequency: 'monthly',
+		flagColor: TransactionFlagColor::Blue,
+		frequency: ScheduledTransactionFrequency::Monthly,
 	);
 
 	expect($payload->toArray())->toBe([
@@ -366,7 +370,7 @@ it('CreateScheduledTransactionRequest toArray() wraps payload under scheduled_tr
 		accountId: 'A1',
 		date: '2026-05-01',
 		amount: -60000,
-		frequency: 'monthly',
+		frequency: ScheduledTransactionFrequency::Monthly,
 	);
 	$request = new CreateScheduledTransactionRequest(scheduledTransaction: $payload);
 
@@ -410,7 +414,7 @@ it('UpdateScheduledTransactionRequest toArray() wraps payload under scheduled_tr
 it('CreateAccountRequest toArray() wraps fields under account key', function () {
 	$request = new CreateAccountRequest(
 		name: 'Checking',
-		type: 'checking',
+		type: AccountType::Checking,
 		balance: 100000,
 	);
 
