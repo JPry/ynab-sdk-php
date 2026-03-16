@@ -15,6 +15,7 @@ final readonly class Month
 		public int $toBeBudgeted,
 		public ?int $ageOfMoney,
 		public bool $deleted,
+		public ?array $categories,
 	) {
 	}
 
@@ -35,6 +36,7 @@ final readonly class Month
 			toBeBudgeted: (int) ($row['to_be_budgeted'] ?? 0),
 			ageOfMoney: array_key_exists('age_of_money', $row) && $row['age_of_money'] !== null ? (int) $row['age_of_money'] : null,
 			deleted: (bool) ($row['deleted'] ?? false),
+			categories: isset($row['categories']) && is_array($row['categories']) ? $row['categories'] : null,
 		);
 	}
 }
