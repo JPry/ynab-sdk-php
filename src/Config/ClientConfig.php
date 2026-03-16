@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Config;
 
+use InvalidArgumentException;
+
 final readonly class ClientConfig
 {
 	public function __construct(
@@ -30,6 +32,6 @@ final readonly class ClientConfig
 			? 'ClientConfig baseUrl must start with http:// or https://.'
 			: 'ClientConfig baseUrl must start with https://. Pass allowInsecure: true only for local testing.';
 
-		throw new \InvalidArgumentException($message);
+		throw new InvalidArgumentException($message);
 	}
 }
