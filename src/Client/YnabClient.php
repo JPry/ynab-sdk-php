@@ -244,17 +244,14 @@ final readonly class YnabClient
 	}
 
 	/** @return ResourceCollection<Account> */
-	public function accounts(string $budgetId, array $query = []): ResourceCollection
+	public function accounts(string $planId, array $query = []): ResourceCollection
 	{
-		$planId = $budgetId;
-
 		return $this->collection("/plans/{$planId}/accounts", $query, 'accounts', static fn (array $row): ?Account => Account::fromArray($row));
 	}
 
 	/** @return ResourceCollection<Category> */
-	public function categories(string $budgetId, array $query = []): ResourceCollection
+	public function categories(string $planId, array $query = []): ResourceCollection
 	{
-		$planId = $budgetId;
 		$items = [];
 		$serverKnowledge = null;
 		$nextQuery = $query;
@@ -325,18 +322,14 @@ final readonly class YnabClient
 	}
 
 	/** @return ResourceCollection<Payee> */
-	public function payees(string $budgetId, array $query = []): ResourceCollection
+	public function payees(string $planId, array $query = []): ResourceCollection
 	{
-		$planId = $budgetId;
-
 		return $this->collection("/plans/{$planId}/payees", $query, 'payees', static fn (array $row): ?Payee => Payee::fromArray($row));
 	}
 
 	/** @return ResourceCollection<Transaction> */
-	public function transactions(string $budgetId, array $query = []): ResourceCollection
+	public function transactions(string $planId, array $query = []): ResourceCollection
 	{
-		$planId = $budgetId;
-
 		return $this->collection("/plans/{$planId}/transactions", $query, 'transactions', static fn (array $row): ?Transaction => Transaction::fromArray($row));
 	}
 
@@ -344,10 +337,8 @@ final readonly class YnabClient
 	 * @param array<string,mixed>|PatchTransactionsRequest $payload
 	 * @return array<string,mixed>
 	 */
-	public function patchTransactions(string $budgetId, array|PatchTransactionsRequest $payload): array
+	public function patchTransactions(string $planId, array|PatchTransactionsRequest $payload): array
 	{
-		$planId = $budgetId;
-
 		return $this->request('PATCH', "/plans/{$planId}/transactions", [], $this->payloadToArray($payload));
 	}
 
