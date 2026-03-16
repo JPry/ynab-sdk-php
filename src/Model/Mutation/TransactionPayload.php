@@ -26,41 +26,20 @@ final readonly class TransactionPayload implements RequestModel
 	/** @return array<string,mixed> */
 	public function toArray(): array
 	{
-		$data = [];
+		$data = array_filter([
+			'account_id' => $this->accountId,
+			'date' => $this->date,
+			'amount' => $this->amount,
+			'payee_id' => $this->payeeId,
+			'payee_name' => $this->payeeName,
+			'category_id' => $this->categoryId,
+			'memo' => $this->memo,
+			'cleared' => $this->cleared,
+			'approved' => $this->approved,
+			'flag_color' => $this->flagColor,
+			'import_id' => $this->importId,
+		], fn($v) => $v !== null);
 
-		if ($this->accountId !== null) {
-			$data['account_id'] = $this->accountId;
-		}
-		if ($this->date !== null) {
-			$data['date'] = $this->date;
-		}
-		if ($this->amount !== null) {
-			$data['amount'] = $this->amount;
-		}
-		if ($this->payeeId !== null) {
-			$data['payee_id'] = $this->payeeId;
-		}
-		if ($this->payeeName !== null) {
-			$data['payee_name'] = $this->payeeName;
-		}
-		if ($this->categoryId !== null) {
-			$data['category_id'] = $this->categoryId;
-		}
-		if ($this->memo !== null) {
-			$data['memo'] = $this->memo;
-		}
-		if ($this->cleared !== null) {
-			$data['cleared'] = $this->cleared;
-		}
-		if ($this->approved !== null) {
-			$data['approved'] = $this->approved;
-		}
-		if ($this->flagColor !== null) {
-			$data['flag_color'] = $this->flagColor;
-		}
-		if ($this->importId !== null) {
-			$data['import_id'] = $this->importId;
-		}
 		if ($this->subtransactions !== []) {
 			$data['subtransactions'] = array_map(
 				static fn (SubTransactionPayload $subtransaction): array => $subtransaction->toArray(),

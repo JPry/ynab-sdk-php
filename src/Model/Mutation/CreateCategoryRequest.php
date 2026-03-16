@@ -18,23 +18,18 @@ final readonly class CreateCategoryRequest implements RequestModel
 	/** @return array<string,mixed> */
 	public function toArray(): array
 	{
-		$data = [
+		$required = [
 			'name' => $this->name,
 			'category_group_id' => $this->categoryGroupId,
 		];
-
-		if ($this->note !== null) {
-			$data['note'] = $this->note;
-		}
-		if ($this->goalTarget !== null) {
-			$data['goal_target'] = $this->goalTarget;
-		}
-		if ($this->goalTargetDate !== null) {
-			$data['goal_target_date'] = $this->goalTargetDate;
-		}
+		$optional = array_filter([
+			'note' => $this->note,
+			'goal_target' => $this->goalTarget,
+			'goal_target_date' => $this->goalTargetDate,
+		], fn($v) => $v !== null);
 
 		return [
-			'category' => $data,
+			'category' => array_merge($required, $optional),
 		];
 	}
 }

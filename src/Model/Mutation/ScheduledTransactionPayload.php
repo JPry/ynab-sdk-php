@@ -22,33 +22,20 @@ final readonly class ScheduledTransactionPayload implements RequestModel
 	/** @return array<string,mixed> */
 	public function toArray(): array
 	{
-		$data = [
+		$required = [
 			'account_id' => $this->accountId,
 			'date' => $this->date,
 		];
+		$optional = array_filter([
+			'amount' => $this->amount,
+			'payee_id' => $this->payeeId,
+			'payee_name' => $this->payeeName,
+			'category_id' => $this->categoryId,
+			'memo' => $this->memo,
+			'flag_color' => $this->flagColor,
+			'frequency' => $this->frequency,
+		], fn($v) => $v !== null);
 
-		if ($this->amount !== null) {
-			$data['amount'] = $this->amount;
-		}
-		if ($this->payeeId !== null) {
-			$data['payee_id'] = $this->payeeId;
-		}
-		if ($this->payeeName !== null) {
-			$data['payee_name'] = $this->payeeName;
-		}
-		if ($this->categoryId !== null) {
-			$data['category_id'] = $this->categoryId;
-		}
-		if ($this->memo !== null) {
-			$data['memo'] = $this->memo;
-		}
-		if ($this->flagColor !== null) {
-			$data['flag_color'] = $this->flagColor;
-		}
-		if ($this->frequency !== null) {
-			$data['frequency'] = $this->frequency;
-		}
-
-		return $data;
+		return array_merge($required, $optional);
 	}
 }

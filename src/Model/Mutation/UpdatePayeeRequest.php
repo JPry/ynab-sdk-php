@@ -15,13 +15,10 @@ final readonly class UpdatePayeeRequest implements RequestModel
 	/** @return array<string,mixed> */
 	public function toArray(): array
 	{
-		$data = [];
-		if ($this->name !== null) {
-			$data['name'] = $this->name;
-		}
-
 		return [
-			'payee' => $data,
+			'payee' => array_filter([
+				'name' => $this->name,
+			], fn($v) => $v !== null),
 		];
 	}
 }

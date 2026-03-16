@@ -18,23 +18,14 @@ final readonly class SubTransactionPayload implements RequestModel
 	/** @return array<string,mixed> */
 	public function toArray(): array
 	{
-		$data = [
-			'amount' => $this->amount,
-		];
+		$required = ['amount' => $this->amount];
+		$optional = array_filter([
+			'payee_id' => $this->payeeId,
+			'payee_name' => $this->payeeName,
+			'category_id' => $this->categoryId,
+			'memo' => $this->memo,
+		], fn($v) => $v !== null);
 
-		if ($this->payeeId !== null) {
-			$data['payee_id'] = $this->payeeId;
-		}
-		if ($this->payeeName !== null) {
-			$data['payee_name'] = $this->payeeName;
-		}
-		if ($this->categoryId !== null) {
-			$data['category_id'] = $this->categoryId;
-		}
-		if ($this->memo !== null) {
-			$data['memo'] = $this->memo;
-		}
-
-		return $data;
+		return array_merge($required, $optional);
 	}
 }

@@ -16,15 +16,11 @@ final readonly class PatchTransactionPayload implements RequestModel
 	/** @return array<string,mixed> */
 	public function toArray(): array
 	{
-		$data = $this->transaction->toArray();
+		$optional = array_filter([
+			'id' => $this->id,
+			'import_id' => $this->importId,
+		], fn($v) => $v !== null);
 
-		if ($this->id !== null) {
-			$data['id'] = $this->id;
-		}
-		if ($this->importId !== null) {
-			$data['import_id'] = $this->importId;
-		}
-
-		return $data;
+		return array_merge($this->transaction->toArray(), $optional);
 	}
 }
