@@ -53,7 +53,7 @@ it(
 		expect($output)->toBeString();
 		expect($output)->not->toContain($accessToken);
 		expect($output)->toContain('REDACTED access token');
-		expect($output)->toMatch('/public \$refreshAccessToken =>\s*NULL/');
+		expect($output)->toMatch('/refreshAccessToken["\]]*\s*=>\s*NULL/');
 
 		// Test with the refresh token.
 		$auth = new OAuthTokenAuth($accessToken, $refreshToken);
