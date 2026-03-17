@@ -13,10 +13,8 @@ use JPry\YNAB\Exception\YnabApiException;
 use JPry\YNAB\Exception\YnabException;
 use JPry\YNAB\Http\GuzzleRequestSender;
 use JPry\YNAB\Http\RequestSender;
-use JPry\YNAB\Internal\BudgetDeprecationWarningTrait;
 use JPry\YNAB\Internal\YnabErrorParser;
 use JPry\YNAB\Model\Account;
-use JPry\YNAB\Model\Budget;
 use JPry\YNAB\Model\Category;
 use JPry\YNAB\Model\CategoryDetail;
 use JPry\YNAB\Model\CategoryGroup;
@@ -50,8 +48,6 @@ use Psr\Http\Message\ResponseInterface;
 
 final readonly class YnabClient
 {
-	use BudgetDeprecationWarningTrait;
-
 	public function __construct(
 		private RequestSender $requestSender,
 		private AuthMethod $auth,
@@ -76,40 +72,16 @@ final readonly class YnabClient
 		return new self($requestSender, new OAuthTokenAuth($accessToken, $refreshAccessToken), $config);
 	}
 
-	/**
-	 * @deprecated YNAB API v1.79.0 renamed budgets to plans. Use plans() instead.
-	 * @return ResourceCollection<Budget>
-	 */
-	public function budgets(array $query = []): ResourceCollection
-	{
-		$this->warnBudgetDeprecation('budgets()', 'plans()');
-
-		return $this->collection('/plans', $query, ['plans', 'budgets'], static fn (array $row): ?Budget => Budget::fromArray($row));
-	}
-
 	/** @return ResourceCollection<Plan> */
 	public function plans(array $query = []): ResourceCollection
 	{
-		return $this->collection('/plans', $query, ['plans', 'budgets'], static fn (array $row): ?Plan => Plan::fromArray($row));
-	}
-
-	/**
-	 * @deprecated YNAB API v1.79.0 renamed default_budget to default_plan. Use defaultPlan() instead.
-	 */
-	public function defaultBudget(): ?Budget
-	{
-		$this->warnBudgetDeprecation('defaultBudget()', 'defaultPlan()');
-
-		$data = $this->get('/plans/default');
-		$default = $this->firstArrayByKeys($data, ['budget', 'plan']);
-
-		return $default === null ? null : Budget::fromArray($default);
+		return $this->collection('/plans', $query, 'plans', static fn (array $row): ?Plan => Plan::fromArray($row));
 	}
 
 	public function defaultPlan(): ?Plan
 	{
 		$data = $this->get('/plans/default');
-		$default = $this->firstArrayByKeys($data, ['plan', 'budget']);
+		$default = $this->firstArrayByKeys($data, ['plan']);
 
 		return $default === null ? null : Plan::fromArray($default);
 	}
@@ -128,7 +100,7 @@ final readonly class YnabClient
 
 	public function plan(string $planId): ?Plan
 	{
-		return $this->item("/plans/{$planId}", [], ['plan', 'budget'], static fn (array $row): ?Plan => Plan::fromArray($row));
+		return $this->item("/plans/{$planId}", [], 'plan', static fn (array $row): ?Plan => Plan::fromArray($row));
 	}
 
 	public function account(string $planId, string $accountId): ?Account

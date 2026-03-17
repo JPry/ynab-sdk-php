@@ -97,56 +97,6 @@ it('throws structured api exception for ynab error payloads', function () {
 	}
 });
 
-it('accepts legacy budget response keys on plan methods', function () {
-	$sender = new ArrayRequestSender([
-		fn ($request) => new Response(200, [], '{"data":{"budgets":[{"id":"B1","name":"Main"}]}}'),
-		fn ($request) => new Response(200, [], '{"data":{"budget":{"id":"B1","name":"Main"}}}'),
-	]);
-
-	$client = YnabClient::withApiKey('api-key-123', requestSender: $sender);
-
-	$plans = $client->plans();
-	$defaultPlan = $client->defaultPlan();
-
-	expect($plans->items)->toHaveCount(1);
-	expect($plans->items[0]?->id)->toBe('B1');
-	expect($defaultPlan?->id)->toBe('B1');
-});
-
-it('keeps budget-named methods and emits deprecation warnings', function () {
-	$sender = new ArrayRequestSender([
-		fn ($request) => new Response(200, [], '{"data":{"plans":[{"id":"P1","name":"Main"}]}}'),
-		fn ($request) => new Response(200, [], '{"data":{"plan":{"id":"P1","name":"Main"}}}'),
-	]);
-
-	$client = YnabClient::withApiKey('api-key-123', requestSender: $sender);
-
-	$warnings = [];
-	$handler = static function (int $errno, string $errstr) use (&$warnings): bool {
-		if ($errno === E_USER_DEPRECATED) {
-			$warnings[] = $errstr;
-			return true;
-		}
-
-		return false;
-	};
-
-	set_error_handler($handler);
-	try {
-		$budgets = $client->budgets();
-		$defaultBudget = $client->defaultBudget();
-	} finally {
-		restore_error_handler();
-	}
-
-	$joinedWarnings = implode("\n", $warnings);
-
-	expect($budgets->items)->toHaveCount(1);
-	expect($defaultBudget?->id)->toBe('P1');
-	expect($joinedWarnings)->toContain('budgets() is deprecated');
-	expect($joinedWarnings)->toContain('defaultBudget() is deprecated');
-});
-
 it('retrieves user and plan settings', function () {
 	$sender = new ArrayRequestSender([
 		fn ($request) => new Response(200, [], '{"data":{"user":{"id":"U1"}}}'),

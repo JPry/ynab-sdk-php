@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use JPry\YNAB\Model\Account;
-use JPry\YNAB\Model\Budget;
 use JPry\YNAB\Model\CategoryDetail;
 use JPry\YNAB\Model\Payee;
 use JPry\YNAB\OAuth\OAuthTokens;
@@ -24,14 +23,6 @@ it('maps plan rows into typed objects', function () {
 	expect($plan)->not->toBeNull();
 	expect($plan?->id)->toBe('P1');
 	expect($plan?->name)->toBe('Main');
-});
-
-it('keeps budget model mapping', function () {
-	$budget = Budget::fromArray(['id' => 'B1', 'name' => 'Main']);
-
-	expect($budget)->not->toBeNull();
-	expect($budget?->id)->toBe('B1');
-	expect($budget?->name)->toBe('Main');
 });
 
 it('maps transaction rows and keeps raw payload', function () {
