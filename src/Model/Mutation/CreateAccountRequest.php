@@ -4,15 +4,24 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model\Mutation;
 
+use JPry\YNAB\Model\Enum\AccountType;
 use JPry\YNAB\Model\Enum\SaveAccountType;
 
 final readonly class CreateAccountRequest implements RequestModel
 {
+	public readonly SaveAccountType $saveType;
+
+	/**
+	 * @todo v3.0.0: Remove AccountType acceptance — only allow SaveAccountType.
+	 */
 	public function __construct(
 		public string $name,
-		public SaveAccountType $type,
+		public SaveAccountType|AccountType $type,
 		public int $balance,
 	) {
+		$this->saveType = $type instanceof SaveAccountType
+			? $type
+			: SaveAccountType::from($type->value);
 	}
 
 	/** @return array<string,mixed> */
@@ -21,7 +30,7 @@ final readonly class CreateAccountRequest implements RequestModel
 		return [
 			'account' => [
 				'name' => $this->name,
-				'type' => $this->type->value,
+				'type' => $this->saveType->value,
 				'balance' => $this->balance,
 			],
 		];

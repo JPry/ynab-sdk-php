@@ -430,6 +430,26 @@ it('CreateAccountRequest toArray() wraps fields under account key', function () 
 	]);
 });
 
+it('CreateAccountRequest accepts legacy AccountType for backward compatibility', function () {
+	$request = new CreateAccountRequest(
+		name: 'Savings',
+		type: AccountType::Savings,
+		balance: 50000,
+	);
+
+	$result = $request->toArray();
+
+	expect($result['account']['type'])->toBe('savings');
+});
+
+it('CreateAccountRequest throws ValueError for AccountType not in SaveAccountType', function () {
+	expect(fn () => new CreateAccountRequest(
+		name: 'Mortgage',
+		type: AccountType::Mortgage,
+		balance: 0,
+	))->toThrow(ValueError::class);
+});
+
 // ---------------------------------------------------------------------------
 // CreateCategoryGroupRequest
 // ---------------------------------------------------------------------------

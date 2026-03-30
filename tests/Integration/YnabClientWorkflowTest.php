@@ -22,7 +22,7 @@ use JPry\YNAB\Model\Mutation\UpdateMonthCategoryRequest;
 use JPry\YNAB\Model\Mutation\UpdatePayeeRequest;
 use JPry\YNAB\Model\Mutation\UpdateScheduledTransactionRequest;
 use JPry\YNAB\Model\Mutation\UpdateTransactionRequest;
-use JPry\YNAB\Model\Enum\SaveAccountType;
+use JPry\YNAB\Model\Enum\AccountType;
 use JPry\YNAB\Tests\Fakes\ArrayRequestSender;
 use GuzzleHttp\Psr7\Response;
 
@@ -274,7 +274,7 @@ it('supports plan-scoped write endpoints from openapi coverage audit', function 
 		new UpdateScheduledTransactionRequest('ST1', new ScheduledTransactionPayload(accountId: 'A1', date: '2026-04-01', memo: 'Changed')),
 	);
 	$client->deleteScheduledTransaction('P1', new UpdateScheduledTransactionRequest('ST1', new ScheduledTransactionPayload(accountId: 'A1', date: '2026-04-01')));
-	$client->createAccount('P1', new CreateAccountRequest(name: 'New Account', type: SaveAccountType::Checking, balance: 0));
+	$client->createAccount('P1', new CreateAccountRequest(name: 'New Account', type: AccountType::Checking, balance: 0));
 	$client->createCategory('P1', new CreateCategoryRequest(name: 'New Category', categoryGroupId: 'CG1'));
 	$client->updateCategory('P1', new UpdateCategoryRequest(id: 'C1', name: 'Renamed'));
 	$client->updateMonthCategory('P1', '2026-03-01', new UpdateMonthCategoryRequest(id: 'C1', budgeted: 1234));
