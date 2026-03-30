@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace JPry\YNAB\Model\Mutation;
 
-use JPry\YNAB\Model\Enum\AccountType;
+use JPry\YNAB\Model\Enum\SaveAccountType;
 
 final readonly class CreateAccountRequest implements RequestModel
 {
 	public function __construct(
 		public string $name,
-		public AccountType $type,
+		public SaveAccountType $type,
 		public int $balance,
 	) {
 	}

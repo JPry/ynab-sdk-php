@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use JPry\YNAB\Model\Mutation\CreateAccountRequest;
+use JPry\YNAB\Model\Mutation\CreatePayeeRequest;
 use JPry\YNAB\Model\Mutation\CreateCategoryGroupRequest;
 use JPry\YNAB\Model\Mutation\CreateCategoryRequest;
 use JPry\YNAB\Model\Mutation\CreateScheduledTransactionRequest;
@@ -414,7 +415,7 @@ it('UpdateScheduledTransactionRequest toArray() wraps payload under scheduled_tr
 it('CreateAccountRequest toArray() wraps fields under account key', function () {
 	$request = new CreateAccountRequest(
 		name: 'Checking',
-		type: AccountType::Checking,
+		type: SaveAccountType::Checking,
 		balance: 100000,
 	);
 
