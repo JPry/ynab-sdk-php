@@ -5,7 +5,7 @@ info:
     and relies upon HTTPS for transport. We respond with meaningful HTTP
     response codes and if an error occurs, we include error details in the
     response body.  API Documentation is at https://api.ynab.com
-  version: 1.79.0
+  version: 1.81.0
 servers:
   - url: https://api.ynab.com/v1
 security:
@@ -622,6 +622,43 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+        - Payees
+      summary: Create a payee
+      description: Creates a new payee
+      operationId: createPayee
+      parameters:
+        - name: plan_id
+          in: path
+          description: 'The id of the plan. "last-used" can be used to specify the last
+            used plan and "default" can be used if default plan selection is
+            enabled (see: https://api.ynab.com/#oauth-default-plan).'
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The payee to create
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostPayeeWrapper"
+        required: true
+      responses:
+        "201":
+          description: The payee was successfully created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavePayeeResponse"
+        "400":
+          description: The request could not be understood due to malformed syntax or
+            validation error(s)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-codegen-request-body-name: data
   /plans/{plan_id}/payees/{payee_id}:
     get:
       tags:
@@ -2085,7 +2122,7 @@ components:
           type: string
           description: The name of the account
         type:
-          $ref: "#/components/schemas/AccountType"
+          $ref: "#/components/schemas/SaveAccountType"
         balance:
           type: integer
           description: The current balance of the account in milliunits format
@@ -2097,6 +2134,14 @@ components:
       additionalProperties:
         type: integer
         format: int64
+    SaveAccountType:
+      type: string
+      description: The type of account to create or update
+      enum:
+        - checking
+        - savings
+        - cash
+        - creditCard
     AccountType:
       type: string
       description: The type of account
@@ -2951,6 +2996,23 @@ components:
               type: string
               description: The name of the category.  If a split transaction, this will be
                 'Split'.
+    PostPayeeWrapper:
+      required:
+        - payee
+      type: object
+      properties:
+        payee:
+          $ref: "#/components/schemas/PostPayee"
+    PostPayee:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: false
+          maxLength: 500
+          description: The name of the payee.
     PatchPayeeWrapper:
       required:
         - payee
@@ -2965,7 +3027,7 @@ components:
           type: string
           nullable: false
           maxLength: 500
-          description: The name of the payee. The name must be a maximum of 500 characters.
+          description: The name of the payee.
     PostCategoryGroupWrapper:
       required:
         - category_group
