@@ -15,6 +15,7 @@ use JPry\YNAB\Model\Mutation\ScheduledTransactionPayload;
 use JPry\YNAB\Model\Mutation\SubTransactionPayload;
 use JPry\YNAB\Model\Mutation\TransactionPayload;
 use JPry\YNAB\Model\Enum\AccountType;
+use JPry\YNAB\Model\Enum\SaveAccountType;
 use JPry\YNAB\Model\Enum\ScheduledTransactionFrequency;
 use JPry\YNAB\Model\Enum\TransactionClearedStatus;
 use JPry\YNAB\Model\Enum\TransactionFlagColor;
@@ -515,4 +516,17 @@ it('UpdateMonthCategoryRequest toArray() wraps budgeted under category key', fun
 
 	expect($result)->toHaveKey('category');
 	expect($result['category'])->toBe(['budgeted' => 50000]);
+});
+
+// ---------------------------------------------------------------------------
+// CreatePayeeRequest
+// ---------------------------------------------------------------------------
+
+it('CreatePayeeRequest toArray() wraps name under payee key', function () {
+	$request = new CreatePayeeRequest(name: 'Grocery Store');
+
+	$result = $request->toArray();
+
+	expect($result)->toHaveKey('payee');
+	expect($result['payee'])->toBe(['name' => 'Grocery Store']);
 });

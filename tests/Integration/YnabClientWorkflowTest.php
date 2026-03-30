@@ -7,6 +7,7 @@ use JPry\YNAB\Exception\YnabApiException;
 use JPry\YNAB\Exception\YnabException;
 use JPry\YNAB\Model\Mutation\CreateAccountRequest;
 use JPry\YNAB\Model\Mutation\CreateCategoryGroupRequest;
+use JPry\YNAB\Model\Mutation\CreatePayeeRequest;
 use JPry\YNAB\Model\Mutation\CreateCategoryRequest;
 use JPry\YNAB\Model\Mutation\CreateScheduledTransactionRequest;
 use JPry\YNAB\Model\Mutation\CreateTransactionsRequest;
@@ -21,7 +22,7 @@ use JPry\YNAB\Model\Mutation\UpdateMonthCategoryRequest;
 use JPry\YNAB\Model\Mutation\UpdatePayeeRequest;
 use JPry\YNAB\Model\Mutation\UpdateScheduledTransactionRequest;
 use JPry\YNAB\Model\Mutation\UpdateTransactionRequest;
-use JPry\YNAB\Model\Enum\AccountType;
+use JPry\YNAB\Model\Enum\SaveAccountType;
 use JPry\YNAB\Tests\Fakes\ArrayRequestSender;
 use GuzzleHttp\Psr7\Response;
 
@@ -255,6 +256,7 @@ it('supports plan-scoped write endpoints from openapi coverage audit', function 
 		fn ($request) => new Response(200, [], '{"data":{"category":{"id":"C1"}}}'),
 		fn ($request) => new Response(201, [], '{"data":{"category_group":{"id":"CG1"}}}'),
 		fn ($request) => new Response(200, [], '{"data":{"category_group":{"id":"CG1"}}}'),
+		fn ($request) => new Response(201, [], '{"data":{"payee":{"id":"PY2"},"server_knowledge":1}}'),
 		fn ($request) => new Response(200, [], '{"data":{"payee":{"id":"PY1"}}}'),
 	]);
 
@@ -272,12 +274,13 @@ it('supports plan-scoped write endpoints from openapi coverage audit', function 
 		new UpdateScheduledTransactionRequest('ST1', new ScheduledTransactionPayload(accountId: 'A1', date: '2026-04-01', memo: 'Changed')),
 	);
 	$client->deleteScheduledTransaction('P1', new UpdateScheduledTransactionRequest('ST1', new ScheduledTransactionPayload(accountId: 'A1', date: '2026-04-01')));
-	$client->createAccount('P1', new CreateAccountRequest(name: 'New Account', type: AccountType::Checking, balance: 0));
+	$client->createAccount('P1', new CreateAccountRequest(name: 'New Account', type: SaveAccountType::Checking, balance: 0));
 	$client->createCategory('P1', new CreateCategoryRequest(name: 'New Category', categoryGroupId: 'CG1'));
 	$client->updateCategory('P1', new UpdateCategoryRequest(id: 'C1', name: 'Renamed'));
 	$client->updateMonthCategory('P1', '2026-03-01', new UpdateMonthCategoryRequest(id: 'C1', budgeted: 1234));
 	$client->createCategoryGroup('P1', new CreateCategoryGroupRequest(name: 'New Group'));
 	$client->updateCategoryGroup('P1', new UpdateCategoryGroupRequest(id: 'CG1', name: 'Renamed Group'));
+	$client->createPayee('P1', new CreatePayeeRequest(name: 'New Payee'));
 	$client->updatePayee('P1', new UpdatePayeeRequest(id: 'PY1', name: 'Renamed Payee'));
 
 	expect($sender->requests[0]->getMethod())->toBe('POST');
@@ -320,8 +323,11 @@ it('supports plan-scoped write endpoints from openapi coverage audit', function 
 	expect($sender->requests[12]->getMethod())->toBe('PATCH');
 	expect($sender->requests[12]->getUri()->getPath())->toEndWith('/plans/P1/category_groups/CG1');
 
-	expect($sender->requests[13]->getMethod())->toBe('PATCH');
-	expect($sender->requests[13]->getUri()->getPath())->toEndWith('/plans/P1/payees/PY1');
+	expect($sender->requests[13]->getMethod())->toBe('POST');
+	expect($sender->requests[13]->getUri()->getPath())->toEndWith('/plans/P1/payees');
+
+	expect($sender->requests[14]->getMethod())->toBe('PATCH');
+	expect($sender->requests[14]->getUri()->getPath())->toEndWith('/plans/P1/payees/PY1');
 });
 
 it('accepts typed patch transaction request models', function () {

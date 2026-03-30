@@ -21,6 +21,7 @@ use JPry\YNAB\Model\CategoryGroup;
 use JPry\YNAB\Model\Month;
 use JPry\YNAB\Model\Mutation\CreateAccountRequest;
 use JPry\YNAB\Model\Mutation\CreateCategoryGroupRequest;
+use JPry\YNAB\Model\Mutation\CreatePayeeRequest;
 use JPry\YNAB\Model\Mutation\CreateCategoryRequest;
 use JPry\YNAB\Model\Mutation\CreateScheduledTransactionRequest;
 use JPry\YNAB\Model\Mutation\CreateTransactionsRequest;
@@ -435,6 +436,15 @@ final readonly class YnabClient
 	public function updateCategoryGroup(string $planId, UpdateCategoryGroupRequest|string $categoryGroupId, ?array $payload = null): array
 	{
 		return $this->mutate('PATCH', "/plans/{$planId}/category_groups", 'updateCategoryGroup', $categoryGroupId, $payload);
+	}
+
+	/**
+	 * @param array<string,mixed>|CreatePayeeRequest $payload
+	 * @return array<string,mixed>
+	 */
+	public function createPayee(string $planId, array|CreatePayeeRequest $payload): array
+	{
+		return $this->request('POST', "/plans/{$planId}/payees", [], $this->payloadToArray($payload));
 	}
 
 	/**
