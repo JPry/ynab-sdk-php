@@ -15,6 +15,11 @@ return (new PhpCsFixer\Config())
 		'array_syntax' => ['syntax' => 'short'],
 		'indentation_type' => true,
 		'line_ending' => true,
+		'method_argument_space' => [
+			'on_multiline' => 'ensure_fully_multiline',
+			'attribute_placement' => 'standalone',
+		],
+		'method_chaining_indentation' => true,
 		'no_trailing_whitespace' => true,
 		'single_quote' => true,
 	])
