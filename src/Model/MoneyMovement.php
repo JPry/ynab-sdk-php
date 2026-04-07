@@ -21,6 +21,8 @@ final readonly class MoneyMovement implements Model
 		public ?string $fromCategoryId,
 		public ?string $toCategoryId,
 		public int $amount,
+		public ?string $amountFormatted,
+		public ?float $amountCurrency,
 	) {
 	}
 
@@ -42,6 +44,8 @@ final readonly class MoneyMovement implements Model
 			fromCategoryId: ArrayReader::nullableString($row, 'from_category_id'),
 			toCategoryId: ArrayReader::nullableString($row, 'to_category_id'),
 			amount: ArrayReader::int($row, 'amount'),
+			amountFormatted: ArrayReader::nullableString($row, 'amount_formatted'),
+			amountCurrency: ArrayReader::nullableFloat($row, 'amount_currency'),
 		);
 	}
 }

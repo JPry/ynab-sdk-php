@@ -23,6 +23,8 @@ final readonly class Transaction implements Model
 		public ?string $cleared,
 		public ?bool $approved,
 		public ?string $categoryId,
+		public ?string $amountFormatted,
+		public ?float $amountCurrency,
 		public array $raw,
 	) {
 	}
@@ -46,6 +48,8 @@ final readonly class Transaction implements Model
 			cleared: ArrayReader::nullableString($row, 'cleared'),
 			approved: ArrayReader::nullableBool($row, 'approved'),
 			categoryId: ArrayReader::nullableString($row, 'category_id'),
+			amountFormatted: ArrayReader::nullableString($row, 'amount_formatted'),
+			amountCurrency: ArrayReader::nullableFloat($row, 'amount_currency'),
 			raw: $row,
 		);
 	}

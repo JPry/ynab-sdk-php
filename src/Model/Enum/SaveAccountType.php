@@ -10,4 +10,6 @@ enum SaveAccountType: string
 	case Savings = 'savings';
 	case Cash = 'cash';
 	case CreditCard = 'creditCard';
+	case OtherAsset = 'otherAsset';
+	case OtherLiability = 'otherLiability';
 }

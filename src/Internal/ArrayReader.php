@@ -64,6 +64,16 @@ final class ArrayReader
 	}
 
 	/**
+	 * Returns the float value for the given key, or null if absent or null.
+	 */
+	public static function nullableFloat(array $row, string $key): ?float
+	{
+		return array_key_exists($key, $row) && $row[$key] !== null
+			? (float) $row[$key]
+			: null;
+	}
+
+	/**
 	 * Returns the array value for the given key, or null if absent, null, or not an array.
 	 *
 	 * @return array<mixed>|null
