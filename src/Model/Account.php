@@ -28,6 +28,12 @@ final readonly class Account implements Model
 		public ?bool $directImportInError,
 		public ?string $lastReconciledAt,
 		public ?int $debtOriginalBalance,
+		public ?string $balanceFormatted,
+		public ?float $balanceCurrency,
+		public ?string $clearedBalanceFormatted,
+		public ?float $clearedBalanceCurrency,
+		public ?string $unclearedBalanceFormatted,
+		public ?float $unclearedBalanceCurrency,
 		public array $raw,
 	) {
 	}
@@ -56,6 +62,12 @@ final readonly class Account implements Model
 			directImportInError: ArrayReader::nullableBool($row, 'direct_import_in_error'),
 			lastReconciledAt: ArrayReader::nullableString($row, 'last_reconciled_at'),
 			debtOriginalBalance: ArrayReader::nullableInt($row, 'debt_original_balance'),
+			balanceFormatted: ArrayReader::nullableString($row, 'balance_formatted'),
+			balanceCurrency: ArrayReader::nullableFloat($row, 'balance_currency'),
+			clearedBalanceFormatted: ArrayReader::nullableString($row, 'cleared_balance_formatted'),
+			clearedBalanceCurrency: ArrayReader::nullableFloat($row, 'cleared_balance_currency'),
+			unclearedBalanceFormatted: ArrayReader::nullableString($row, 'uncleared_balance_formatted'),
+			unclearedBalanceCurrency: ArrayReader::nullableFloat($row, 'uncleared_balance_currency'),
 			raw: $row,
 		);
 	}

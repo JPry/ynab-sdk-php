@@ -32,6 +32,8 @@ it('maps transaction rows and keeps raw payload', function () {
 		'amount' => -1234,
 		'is_pending' => false,
 		'memo' => 'Note',
+		'amount_formatted' => '-$12.34',
+		'amount_currency' => -12.34,
 	];
 
 	$tx = Transaction::fromArray($row);
@@ -39,6 +41,8 @@ it('maps transaction rows and keeps raw payload', function () {
 	expect($tx)->not->toBeNull();
 	expect($tx?->id)->toBe('T1');
 	expect($tx?->amount)->toBe(-1234);
+	expect($tx?->amountFormatted)->toBe('-$12.34');
+	expect($tx?->amountCurrency)->toBe(-12.34);
 	expect($tx?->raw)->toBe($row);
 });
 
@@ -88,11 +92,25 @@ it('maps month rows into typed objects', function () {
 		'to_be_budgeted' => 40000,
 		'age_of_money' => 32,
 		'deleted' => false,
+		'income_formatted' => '$1,000.00',
+		'income_currency' => 1000.00,
+		'budgeted_formatted' => '$600.00',
+		'budgeted_currency' => 600.00,
+		'activity_formatted' => '-$250.00',
+		'activity_currency' => -250.00,
+		'to_be_budgeted_formatted' => '$400.00',
+		'to_be_budgeted_currency' => 400.00,
 	]);
 
 	expect($month)->not->toBeNull();
 	expect($month?->month)->toBe('2026-03-01');
 	expect($month?->toBeBudgeted)->toBe(40000);
+	expect($month?->incomeFormatted)->toBe('$1,000.00');
+	expect($month?->incomeCurrency)->toBe(1000.00);
+	expect($month?->budgetedFormatted)->toBe('$600.00');
+	expect($month?->activityFormatted)->toBe('-$250.00');
+	expect($month?->toBeBudgetedFormatted)->toBe('$400.00');
+	expect($month?->toBeBudgetedCurrency)->toBe(400.00);
 });
 
 it('maps money movement rows into typed objects', function () {
@@ -103,12 +121,16 @@ it('maps money movement rows into typed objects', function () {
 		'amount' => 12000,
 		'from_category_id' => 'C1',
 		'to_category_id' => 'C2',
+		'amount_formatted' => '$120.00',
+		'amount_currency' => 120.00,
 	]);
 
 	expect($movement)->not->toBeNull();
 	expect($movement?->id)->toBe('MM1');
 	expect($movement?->amount)->toBe(12000);
 	expect($movement?->fromCategoryId)->toBe('C1');
+	expect($movement?->amountFormatted)->toBe('$120.00');
+	expect($movement?->amountCurrency)->toBe(120.00);
 });
 
 it('maps money movement group rows into typed objects', function () {
@@ -146,12 +168,16 @@ it('maps scheduled transaction rows into typed objects', function () {
 		'frequency' => 'monthly',
 		'amount' => -1000,
 		'deleted' => false,
+		'amount_formatted' => '-$10.00',
+		'amount_currency' => -10.00,
 	]);
 
 	expect($scheduled)->not->toBeNull();
 	expect($scheduled?->id)->toBe('ST1');
 	expect($scheduled?->frequency)->toBe('monthly');
 	expect($scheduled?->amount)->toBe(-1000);
+	expect($scheduled?->amountFormatted)->toBe('-$10.00');
+	expect($scheduled?->amountCurrency)->toBe(-10.00);
 });
 
 it('maps category group rows into typed objects', function () {
@@ -179,12 +205,26 @@ it('maps category detail rows into typed objects', function () {
 		'balance' => 13000,
 		'hidden' => false,
 		'deleted' => false,
+		'balance_formatted' => '$130.00',
+		'balance_currency' => 130.00,
+		'activity_formatted' => '-$120.00',
+		'activity_currency' => -120.00,
+		'budgeted_formatted' => '$250.00',
+		'budgeted_currency' => 250.00,
+		'goal_target_formatted' => '$500.00',
+		'goal_target_currency' => 500.00,
 	]);
 
 	expect($category)->not->toBeNull();
 	expect($category?->id)->toBe('C1');
 	expect($category?->categoryGroupId)->toBe('CG1');
 	expect($category?->budgeted)->toBe(25000);
+	expect($category?->balanceFormatted)->toBe('$130.00');
+	expect($category?->balanceCurrency)->toBe(130.00);
+	expect($category?->activityFormatted)->toBe('-$120.00');
+	expect($category?->budgetedFormatted)->toBe('$250.00');
+	expect($category?->goalTargetFormatted)->toBe('$500.00');
+	expect($category?->goalTargetCurrency)->toBe(500.00);
 });
 
 it('maps account rows into typed objects', function () {
@@ -193,6 +233,12 @@ it('maps account rows into typed objects', function () {
 		'name' => 'Checking',
 		'type' => 'checking',
 		'closed' => false,
+		'balance_formatted' => '$1,234.56',
+		'balance_currency' => 1234.56,
+		'cleared_balance_formatted' => '$1,000.00',
+		'cleared_balance_currency' => 1000.00,
+		'uncleared_balance_formatted' => '$234.56',
+		'uncleared_balance_currency' => 234.56,
 	]);
 
 	expect($account)->not->toBeNull();
@@ -200,6 +246,12 @@ it('maps account rows into typed objects', function () {
 	expect($account?->name)->toBe('Checking');
 	expect($account?->type)->toBe('checking');
 	expect($account?->closed)->toBeFalse();
+	expect($account?->balanceFormatted)->toBe('$1,234.56');
+	expect($account?->balanceCurrency)->toBe(1234.56);
+	expect($account?->clearedBalanceFormatted)->toBe('$1,000.00');
+	expect($account?->clearedBalanceCurrency)->toBe(1000.00);
+	expect($account?->unclearedBalanceFormatted)->toBe('$234.56');
+	expect($account?->unclearedBalanceCurrency)->toBe(234.56);
 });
 
 it('returns null from Account::fromArray when id is missing', function () {

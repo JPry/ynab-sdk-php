@@ -28,6 +28,8 @@ final readonly class ScheduledTransaction implements Model
 		public ?string $categoryId,
 		public ?string $transferAccountId,
 		public bool $deleted,
+		public ?string $amountFormatted,
+		public ?float $amountCurrency,
 		public array $raw,
 	) {
 	}
@@ -56,6 +58,8 @@ final readonly class ScheduledTransaction implements Model
 			categoryId: ArrayReader::nullableString($row, 'category_id'),
 			transferAccountId: ArrayReader::nullableString($row, 'transfer_account_id'),
 			deleted: ArrayReader::bool($row, 'deleted'),
+			amountFormatted: ArrayReader::nullableString($row, 'amount_formatted'),
+			amountCurrency: ArrayReader::nullableFloat($row, 'amount_currency'),
 			raw: $row,
 		);
 	}
