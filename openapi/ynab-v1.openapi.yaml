@@ -5,7 +5,7 @@ info:
     and relies upon HTTPS for transport. We respond with meaningful HTTP
     response codes and if an error occurs, we include error details in the
     response body.  API Documentation is at https://api.ynab.com
-  version: 1.81.0
+  version: 1.82.0
 servers:
   - url: https://api.ynab.com/v1
 security:
@@ -1934,7 +1934,7 @@ components:
             accounts:
               type: array
               items:
-                $ref: "#/components/schemas/Account"
+                $ref: "#/components/schemas/AccountBase"
             payees:
               type: array
               items:
@@ -1950,27 +1950,27 @@ components:
             categories:
               type: array
               items:
-                $ref: "#/components/schemas/Category"
+                $ref: "#/components/schemas/CategoryBase"
             months:
               type: array
               items:
-                $ref: "#/components/schemas/MonthDetail"
+                $ref: "#/components/schemas/MonthDetailBase"
             transactions:
               type: array
               items:
-                $ref: "#/components/schemas/TransactionSummary"
+                $ref: "#/components/schemas/TransactionSummaryBase"
             subtransactions:
               type: array
               items:
-                $ref: "#/components/schemas/SubTransaction"
+                $ref: "#/components/schemas/SubTransactionBase"
             scheduled_transactions:
               type: array
               items:
-                $ref: "#/components/schemas/ScheduledTransactionSummary"
+                $ref: "#/components/schemas/ScheduledTransactionSummaryBase"
             scheduled_subtransactions:
               type: array
               items:
-                $ref: "#/components/schemas/ScheduledSubTransaction"
+                $ref: "#/components/schemas/ScheduledSubTransactionBase"
     PlanSettingsResponse:
       required:
         - data
@@ -2024,7 +2024,7 @@ components:
           properties:
             account:
               $ref: "#/components/schemas/Account"
-    Account:
+    AccountBase:
       required:
         - balance
         - cleared_balance
@@ -2104,6 +2104,32 @@ components:
           type: boolean
           description: Whether or not the account has been deleted.  Deleted accounts will
             only be included in delta requests.
+    Account:
+      allOf:
+        - $ref: "#/components/schemas/AccountBase"
+        - type: object
+          properties:
+            balance_formatted:
+              type: string
+              description: The current available balance of the account formatted in the plan's currency format
+            balance_currency:
+              type: number
+              format: double
+              description: The current available balance of the account as a decimal currency amount
+            cleared_balance_formatted:
+              type: string
+              description: The current cleared balance of the account formatted in the plan's currency format
+            cleared_balance_currency:
+              type: number
+              format: double
+              description: The current cleared balance of the account as a decimal currency amount
+            uncleared_balance_formatted:
+              type: string
+              description: The current uncleared balance of the account formatted in the plan's currency format
+            uncleared_balance_currency:
+              type: number
+              format: double
+              description: The current uncleared balance of the account as a decimal currency amount
     PostAccountWrapper:
       required:
         - account
@@ -2142,6 +2168,8 @@ components:
         - savings
         - cash
         - creditCard
+        - otherAsset
+        - otherLiability
     AccountType:
       type: string
       description: The type of account
@@ -2223,7 +2251,7 @@ components:
           type: boolean
           description: Whether or not the category group has been deleted.  Deleted
             category groups will only be included in delta requests.
-    Category:
+    CategoryBase:
       required:
         - activity
         - balance
@@ -2402,6 +2430,76 @@ components:
           type: boolean
           description: Whether or not the category has been deleted.  Deleted categories
             will only be included in delta requests.
+    Category:
+      allOf:
+        - $ref: "#/components/schemas/CategoryBase"
+        - type: object
+          properties:
+            balance_formatted:
+              type: string
+              description: Available balance of the category formatted in the plan's currency format
+            balance_currency:
+              type: number
+              format: double
+              description: Available balance of the category as a decimal currency amount
+            activity_formatted:
+              type: string
+              description: Activity of the category formatted in the plan's currency format
+            activity_currency:
+              type: number
+              format: double
+              description: Activity of the category as a decimal currency amount
+            budgeted_formatted:
+              type: string
+              description: Assigned (budgeted) amount of the category formatted in the plan's currency format
+            budgeted_currency:
+              type: number
+              format: double
+              description: Assigned (budgeted) amount of the category as a decimal currency amount
+            goal_target_formatted:
+              type:
+                - string
+                - "null"
+              description: The goal target amount formatted in the plan's currency format
+            goal_target_currency:
+              type:
+                - number
+                - "null"
+              format: double
+              description: The goal target amount as a decimal currency amount
+            goal_under_funded_formatted:
+              type:
+                - string
+                - "null"
+              description: The goal underfunded amount formatted in the plan's currency format
+            goal_under_funded_currency:
+              type:
+                - number
+                - "null"
+              format: double
+              description: The goal underfunded amount as a decimal currency amount
+            goal_overall_funded_formatted:
+              type:
+                - string
+                - "null"
+              description: The total amount funded towards the goal formatted in the plan's currency format
+            goal_overall_funded_currency:
+              type:
+                - number
+                - "null"
+              format: double
+              description: The total amount funded towards the goal as a decimal currency amount
+            goal_overall_left_formatted:
+              type:
+                - string
+                - "null"
+              description: The amount of funding still needed to complete the goal formatted in the plan's currency format
+            goal_overall_left_currency:
+              type:
+                - number
+                - "null"
+              format: double
+              description: The amount of funding still needed to complete the goal as a decimal currency amount
     SaveCategoryResponse:
       required:
         - data
@@ -2829,7 +2927,7 @@ components:
               type: integer
               description: The knowledge of the server
               format: int64
-    TransactionSummary:
+    TransactionSummaryBase:
       required:
         - account_id
         - amount
@@ -2939,6 +3037,19 @@ components:
           type: boolean
           description: Whether or not the transaction has been deleted.  Deleted
             transactions will only be included in delta requests.
+    TransactionSummary:
+      allOf:
+        - $ref: "#/components/schemas/TransactionSummaryBase"
+        - type: object
+          properties:
+            amount_formatted:
+              type: string
+              description: The transaction amount formatted in the plan's currency format
+            amount_currency:
+              type: number
+              format: double
+              description: The transaction amount as a decimal currency amount
+
     TransactionDetail:
       allOf:
         - $ref: "#/components/schemas/TransactionSummary"
@@ -3174,7 +3285,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SaveTransactionWithOptionalFields"
-    SubTransaction:
+    SubTransactionBase:
       required:
         - amount
         - deleted
@@ -3228,6 +3339,18 @@ components:
           type: boolean
           description: Whether or not the subtransaction has been deleted.  Deleted
             subtransactions will only be included in delta requests.
+    SubTransaction:
+      allOf:
+        - $ref: "#/components/schemas/SubTransactionBase"
+        - type: object
+          properties:
+            amount_formatted:
+              type: string
+              description: The subtransaction amount formatted in the plan's currency format
+            amount_currency:
+              type: number
+              format: double
+              description: The subtransaction amount as a decimal currency amount
     ScheduledTransactionsResponse:
       required:
         - data
@@ -3327,7 +3450,7 @@ components:
           $ref: "#/components/schemas/TransactionFlagColor"
         frequency:
           $ref: "#/components/schemas/ScheduledTransactionFrequency"
-    ScheduledTransactionSummary:
+    ScheduledTransactionSummaryBase:
       required:
         - account_id
         - amount
@@ -3401,6 +3524,18 @@ components:
           type: boolean
           description: Whether or not the scheduled transaction has been deleted.  Deleted
             scheduled transactions will only be included in delta requests.
+    ScheduledTransactionSummary:
+      allOf:
+        - $ref: "#/components/schemas/ScheduledTransactionSummaryBase"
+        - type: object
+          properties:
+            amount_formatted:
+              type: string
+              description: The scheduled transaction amount formatted in the plan's currency format
+            amount_currency:
+              type: number
+              format: double
+              description: The scheduled transaction amount as a decimal currency amount
     ScheduledTransactionDetail:
       allOf:
         - $ref: "#/components/schemas/ScheduledTransactionSummary"
@@ -3426,7 +3561,7 @@ components:
               description: If a split scheduled transaction, the subtransactions.
               items:
                 $ref: "#/components/schemas/ScheduledSubTransaction"
-    ScheduledSubTransaction:
+    ScheduledSubTransactionBase:
       required:
         - amount
         - deleted
@@ -3478,6 +3613,18 @@ components:
           description: Whether or not the scheduled subtransaction has been deleted.
             Deleted scheduled subtransactions will only be included in delta
             requests.
+    ScheduledSubTransaction:
+      allOf:
+        - $ref: "#/components/schemas/ScheduledSubTransactionBase"
+        - type: object
+          properties:
+            amount_formatted:
+              type: string
+              description: The scheduled subtransaction amount formatted in the plan's currency format
+            amount_currency:
+              type: number
+              format: double
+              description: The scheduled subtransaction amount as a decimal currency amount
     MonthSummariesResponse:
       required:
         - data
@@ -3509,7 +3656,7 @@ components:
           properties:
             month:
               $ref: "#/components/schemas/MonthDetail"
-    MonthSummary:
+    MonthSummaryBase:
       required:
         - activity
         - budgeted
@@ -3554,6 +3701,52 @@ components:
           type: boolean
           description: Whether or not the month has been deleted.  Deleted months will
             only be included in delta requests.
+    MonthSummary:
+      allOf:
+        - $ref: "#/components/schemas/MonthSummaryBase"
+        - type: object
+          properties:
+            income_formatted:
+              type: string
+              description: The total income formatted in the plan's currency format
+            income_currency:
+              type: number
+              format: double
+              description: The total income as a decimal currency amount
+            budgeted_formatted:
+              type: string
+              description: The total amount assigned formatted in the plan's currency format
+            budgeted_currency:
+              type: number
+              format: double
+              description: The total amount assigned as a decimal currency amount
+            activity_formatted:
+              type: string
+              description: The total activity amount formatted in the plan's currency format
+            activity_currency:
+              type: number
+              format: double
+              description: The total activity amount as a decimal currency amount
+            to_be_budgeted_formatted:
+              type: string
+              description: The available amount for 'Ready to Assign' formatted in the plan's currency format
+            to_be_budgeted_currency:
+              type: number
+              format: double
+              description: The available amount for 'Ready to Assign' as a decimal currency amount
+    MonthDetailBase:
+      allOf:
+        - $ref: "#/components/schemas/MonthSummaryBase"
+        - required:
+            - categories
+          type: object
+          properties:
+            categories:
+              type: array
+              description: The plan month categories.  Amounts (budgeted, activity, balance,
+                etc.) are specific to the {month} parameter specified.
+              items:
+                $ref: "#/components/schemas/CategoryBase"
     MonthDetail:
       allOf:
         - $ref: "#/components/schemas/MonthSummary"
@@ -3629,7 +3822,7 @@ components:
               type: integer
               description: The knowledge of the server
               format: int64
-    MoneyMovement:
+    MoneyMovementBase:
       required:
         - id
         - amount
@@ -3683,6 +3876,18 @@ components:
           type: integer
           description: The amount of the money movement in milliunits format
           format: int64
+    MoneyMovement:
+      allOf:
+        - $ref: "#/components/schemas/MoneyMovementBase"
+        - type: object
+          properties:
+            amount_formatted:
+              type: string
+              description: The money movement amount formatted in the plan's currency format
+            amount_currency:
+              type: number
+              format: double
+              description: The money movement amount as a decimal currency amount
     MoneyMovementGroupsResponse:
       required:
         - data
