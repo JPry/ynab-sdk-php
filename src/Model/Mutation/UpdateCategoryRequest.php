@@ -18,6 +18,7 @@ final readonly class UpdateCategoryRequest implements RequestModel, Model
 		public ?string $categoryGroupId = null,
 		public ?int $goalTarget = null,
 		public ?string $goalTargetDate = null,
+		public ?bool $goalNeedsWholeAmount = null,
 	) {
 	}
 
@@ -31,6 +32,7 @@ final readonly class UpdateCategoryRequest implements RequestModel, Model
 				'category_group_id' => $this->categoryGroupId,
 				'goal_target' => $this->goalTarget,
 				'goal_target_date' => $this->goalTargetDate,
+				'goal_needs_whole_amount' => $this->goalNeedsWholeAmount,
 			], fn ($v) => $v !== null),
 		];
 	}

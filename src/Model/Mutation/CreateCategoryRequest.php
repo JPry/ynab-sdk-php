@@ -12,6 +12,7 @@ final readonly class CreateCategoryRequest implements RequestModel
 		public ?string $note = null,
 		public ?int $goalTarget = null,
 		public ?string $goalTargetDate = null,
+		public ?bool $goalNeedsWholeAmount = null,
 	) {
 	}
 
@@ -26,6 +27,7 @@ final readonly class CreateCategoryRequest implements RequestModel
 			'note' => $this->note,
 			'goal_target' => $this->goalTarget,
 			'goal_target_date' => $this->goalTargetDate,
+			'goal_needs_whole_amount' => $this->goalNeedsWholeAmount,
 		], fn ($v) => $v !== null);
 
 		return [

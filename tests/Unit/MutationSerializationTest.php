@@ -184,6 +184,7 @@ it('UpdateCategoryRequest toArray() wraps data under category key', function () 
 		categoryGroupId: 'CG1',
 		goalTarget: 30000,
 		goalTargetDate: '2026-12-31',
+		goalNeedsWholeAmount: true,
 	);
 
 	$result = $request->toArray();
@@ -195,6 +196,7 @@ it('UpdateCategoryRequest toArray() wraps data under category key', function () 
 		'category_group_id' => 'CG1',
 		'goal_target' => 30000,
 		'goal_target_date' => '2026-12-31',
+		'goal_needs_whole_amount' => true,
 	]);
 });
 
@@ -217,6 +219,7 @@ it('UpdateCategoryRequest toArray() excludes null optional fields inside categor
 	expect($inner)->not->toHaveKey('category_group_id');
 	expect($inner)->not->toHaveKey('goal_target');
 	expect($inner)->not->toHaveKey('goal_target_date');
+	expect($inner)->not->toHaveKey('goal_needs_whole_amount');
 });
 
 // ---------------------------------------------------------------------------
@@ -502,6 +505,7 @@ it('CreateCategoryRequest toArray() includes all optional fields when populated'
 		note: 'Weekly food',
 		goalTarget: 30000,
 		goalTargetDate: '2026-12-31',
+		goalNeedsWholeAmount: false,
 	);
 
 	$result = $request->toArray();
@@ -512,6 +516,7 @@ it('CreateCategoryRequest toArray() includes all optional fields when populated'
 		'note' => 'Weekly food',
 		'goal_target' => 30000,
 		'goal_target_date' => '2026-12-31',
+		'goal_needs_whole_amount' => false,
 	]);
 });
 
@@ -523,6 +528,7 @@ it('CreateCategoryRequest toArray() excludes null optional fields inside categor
 	expect($inner)->not->toHaveKey('note');
 	expect($inner)->not->toHaveKey('goal_target');
 	expect($inner)->not->toHaveKey('goal_target_date');
+	expect($inner)->not->toHaveKey('goal_needs_whole_amount');
 });
 
 // ---------------------------------------------------------------------------
