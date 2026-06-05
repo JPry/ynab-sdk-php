@@ -206,6 +206,12 @@ it('defaults category group internal flag to false when missing', function () {
 	expect($group?->internal)->toBeFalse();
 });
 
+it('allows constructing CategoryGroup without the internal argument', function () {
+	$group = new CategoryGroup(id: 'CG1', name: 'Essentials', hidden: false, deleted: false);
+
+	expect($group->internal)->toBeFalse();
+});
+
 it('maps category detail rows into typed objects', function () {
 	$category = CategoryDetail::fromArray([
 		'id' => 'C1',

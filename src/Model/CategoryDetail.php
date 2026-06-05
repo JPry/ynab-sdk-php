@@ -22,7 +22,6 @@ final readonly class CategoryDetail implements Model
 		public int $activity,
 		public int $balance,
 		public bool $hidden,
-		public bool $internal,
 		public bool $deleted,
 		public ?string $balanceFormatted,
 		public ?float $balanceCurrency,
@@ -39,6 +38,7 @@ final readonly class CategoryDetail implements Model
 		public ?string $goalOverallLeftFormatted,
 		public ?float $goalOverallLeftCurrency,
 		public array $raw,
+		public bool $internal = false,
 	) {
 	}
 
