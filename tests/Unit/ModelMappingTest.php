@@ -185,12 +185,25 @@ it('maps category group rows into typed objects', function () {
 		'id' => 'CG1',
 		'name' => 'Essentials',
 		'hidden' => false,
+		'internal' => true,
 		'deleted' => false,
 	]);
 
 	expect($group)->not->toBeNull();
 	expect($group?->id)->toBe('CG1');
 	expect($group?->name)->toBe('Essentials');
+	expect($group?->internal)->toBeTrue();
+});
+
+it('defaults category group internal flag to false when missing', function () {
+	$group = CategoryGroup::fromArray([
+		'id' => 'CG1',
+		'name' => 'Essentials',
+		'hidden' => false,
+		'deleted' => false,
+	]);
+
+	expect($group?->internal)->toBeFalse();
 });
 
 it('maps category detail rows into typed objects', function () {
@@ -204,6 +217,7 @@ it('maps category detail rows into typed objects', function () {
 		'activity' => -12000,
 		'balance' => 13000,
 		'hidden' => false,
+		'internal' => true,
 		'deleted' => false,
 		'balance_formatted' => '$130.00',
 		'balance_currency' => 130.00,
@@ -225,6 +239,7 @@ it('maps category detail rows into typed objects', function () {
 	expect($category?->budgetedFormatted)->toBe('$250.00');
 	expect($category?->goalTargetFormatted)->toBe('$500.00');
 	expect($category?->goalTargetCurrency)->toBe(500.00);
+	expect($category?->internal)->toBeTrue();
 });
 
 it('maps account rows into typed objects', function () {

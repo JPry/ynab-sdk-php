@@ -15,6 +15,7 @@ final readonly class CategoryGroup implements Model
 		public string $id,
 		public string $name,
 		public bool $hidden,
+		public bool $internal,
 		public bool $deleted,
 	) {
 	}
@@ -31,6 +32,7 @@ final readonly class CategoryGroup implements Model
 			id: $id,
 			name: (string) ($row['name'] ?? ''),
 			hidden: ArrayReader::bool($row, 'hidden'),
+			internal: ArrayReader::bool($row, 'internal'),
 			deleted: ArrayReader::bool($row, 'deleted'),
 		);
 	}

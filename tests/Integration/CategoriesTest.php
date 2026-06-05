@@ -13,11 +13,11 @@ it('flattens grouped categories into a ResourceCollection', function () {
 	$sender = new ArrayRequestSender([
 		fn ($request) => new Response(200, [], json_encode(['data' => ['category_groups' => [
 			['id' => 'CG1', 'name' => 'Essentials', 'categories' => [
-				['id' => 'C1', 'name' => 'Groceries', 'hidden' => false, 'deleted' => false],
-				['id' => 'C2', 'name' => 'Utilities', 'hidden' => false, 'deleted' => false],
+				['id' => 'C1', 'name' => 'Groceries', 'hidden' => false, 'internal' => false, 'deleted' => false],
+				['id' => 'C2', 'name' => 'Utilities', 'hidden' => false, 'internal' => false, 'deleted' => false],
 			]],
 			['id' => 'CG2', 'name' => 'Savings', 'categories' => [
-				['id' => 'C3', 'name' => 'Emergency Fund', 'hidden' => false, 'deleted' => false],
+				['id' => 'C3', 'name' => 'Emergency Fund', 'hidden' => false, 'internal' => true, 'deleted' => false],
 			]],
 		], 'server_knowledge' => 5]])),
 	]);
@@ -37,6 +37,7 @@ it('flattens grouped categories into a ResourceCollection', function () {
 	expect($first->groupOrder)->toBe(0);
 	expect($first->categoryOrder)->toBe(0);
 	expect($first->deleted)->toBeFalse();
+	expect($first->internal)->toBeFalse();
 
 	/** @var Category $third */
 	$third = $result->items[2];
@@ -44,6 +45,7 @@ it('flattens grouped categories into a ResourceCollection', function () {
 	expect($third->groupId)->toBe('CG2');
 	expect($third->groupOrder)->toBe(1);
 	expect($third->categoryOrder)->toBe(0);
+	expect($third->internal)->toBeTrue();
 });
 
 it('skips categories with missing id', function () {

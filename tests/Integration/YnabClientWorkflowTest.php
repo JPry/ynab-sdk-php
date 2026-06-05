@@ -443,3 +443,29 @@ it('throws YnabException when a string ID is passed without a payload', function
 
 	expect(fn () => $client->updateTransaction('P1', 'T1'))->toThrow(YnabException::class);
 });
+
+it('forwards since_date and until_date query params on transaction list endpoints', function () {
+	$emptyTransactions = fn ($request) => new Response(200, [], '{"data":{"transactions":[]}}');
+	$sender = new ArrayRequestSender([
+		$emptyTransactions,
+		$emptyTransactions,
+		$emptyTransactions,
+		$emptyTransactions,
+		$emptyTransactions,
+	]);
+
+	$client = YnabClient::withApiKey('api-key-123', requestSender: $sender);
+
+	$dateRange = ['since_date' => '2026-01-01', 'until_date' => '2026-06-30'];
+	$client->transactions('P1', $dateRange);
+	$client->transactionsByAccount('P1', 'A1', $dateRange);
+	$client->transactionsByCategory('P1', 'C1', $dateRange);
+	$client->transactionsByPayee('P1', 'PY1', $dateRange);
+	$client->transactionsByMonth('P1', '2026-03-01', $dateRange);
+
+	foreach ($sender->requests as $request) {
+		parse_str($request->getUri()->getQuery(), $query);
+		expect($query['since_date'] ?? null)->toBe('2026-01-01');
+		expect($query['until_date'] ?? null)->toBe('2026-06-30');
+	}
+});
