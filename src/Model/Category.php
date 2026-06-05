@@ -19,8 +19,8 @@ final readonly class Category implements Model
 		public int $groupOrder,
 		public int $categoryOrder,
 		public bool $hidden,
-		public bool $internal,
 		public bool $deleted,
+		public bool $internal = false,
 	) {
 	}
 

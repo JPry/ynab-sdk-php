@@ -15,8 +15,8 @@ final readonly class CategoryGroup implements Model
 		public string $id,
 		public string $name,
 		public bool $hidden,
-		public bool $internal,
 		public bool $deleted,
+		public bool $internal = false,
 	) {
 	}
 
