@@ -19,6 +19,7 @@ final readonly class Category implements Model
 		public int $groupOrder,
 		public int $categoryOrder,
 		public bool $hidden,
+		public bool $internal,
 		public bool $deleted,
 	) {
 	}
@@ -41,6 +42,7 @@ final readonly class Category implements Model
 			groupOrder: ArrayReader::int($ctx, 'groupOrder'),
 			categoryOrder: ArrayReader::int($ctx, 'categoryOrder'),
 			hidden: ArrayReader::bool($row, 'hidden'),
+			internal: ArrayReader::bool($row, 'internal'),
 			deleted: ArrayReader::bool($row, 'deleted'),
 		);
 	}
