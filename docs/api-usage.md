@@ -21,11 +21,12 @@ $scheduled = $client->scheduledTransactions('plan-id');
 
 ## Filtering and incremental sync
 
-Use query parameters such as `since_date`, `type`, or `last_knowledge_of_server` where supported.
+Use query parameters such as `since_date`, `until_date`, `type`, or `last_knowledge_of_server` where supported. For transaction list endpoints, `since_date` defaults to one year ago when omitted; `until_date` is inclusive.
 
 ```php
 $transactions = $client->transactions('plan-id', [
     'since_date' => '2026-01-01',
+    'until_date' => '2026-06-30',
     'last_knowledge_of_server' => 1234,
 ]);
 
