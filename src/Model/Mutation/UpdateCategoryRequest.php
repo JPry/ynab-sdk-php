@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace JPry\YNAB\Model\Mutation;
 
 use JPry\YNAB\Internal\HasId;
+use JPry\YNAB\Model\Enum\GoalFrequency;
 use JPry\YNAB\Model\Model;
 
 final readonly class UpdateCategoryRequest implements RequestModel, Model
@@ -19,6 +20,7 @@ final readonly class UpdateCategoryRequest implements RequestModel, Model
 		public ?int $goalTarget = null,
 		public ?string $goalTargetDate = null,
 		public ?bool $goalNeedsWholeAmount = null,
+		public ?GoalFrequency $goalFrequency = null,
 	) {
 	}
 
@@ -33,6 +35,7 @@ final readonly class UpdateCategoryRequest implements RequestModel, Model
 				'goal_target' => $this->goalTarget,
 				'goal_target_date' => $this->goalTargetDate,
 				'goal_needs_whole_amount' => $this->goalNeedsWholeAmount,
+				'goal_frequency' => $this->goalFrequency?->value,
 			], fn ($v) => $v !== null),
 		];
 	}

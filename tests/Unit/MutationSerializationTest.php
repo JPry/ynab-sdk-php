@@ -15,6 +15,7 @@ use JPry\YNAB\Model\Mutation\ScheduledTransactionPayload;
 use JPry\YNAB\Model\Mutation\SubTransactionPayload;
 use JPry\YNAB\Model\Mutation\TransactionPayload;
 use JPry\YNAB\Model\Enum\AccountType;
+use JPry\YNAB\Model\Enum\GoalFrequency;
 use JPry\YNAB\Model\Enum\SaveAccountType;
 use JPry\YNAB\Model\Enum\ScheduledTransactionFrequency;
 use JPry\YNAB\Model\Enum\TransactionClearedStatus;
@@ -220,6 +221,19 @@ it('UpdateCategoryRequest toArray() excludes null optional fields inside categor
 	expect($inner)->not->toHaveKey('goal_target');
 	expect($inner)->not->toHaveKey('goal_target_date');
 	expect($inner)->not->toHaveKey('goal_needs_whole_amount');
+	expect($inner)->not->toHaveKey('goal_frequency');
+});
+
+it('UpdateCategoryRequest toArray() serializes goalFrequency to its string value', function () {
+	$request = new UpdateCategoryRequest(
+		id: 'C1',
+		goalTarget: 30000,
+		goalFrequency: GoalFrequency::Weekly,
+	);
+
+	$inner = $request->toArray()['category'];
+
+	expect($inner['goal_frequency'])->toBe('weekly');
 });
 
 // ---------------------------------------------------------------------------
@@ -529,6 +543,20 @@ it('CreateCategoryRequest toArray() excludes null optional fields inside categor
 	expect($inner)->not->toHaveKey('goal_target');
 	expect($inner)->not->toHaveKey('goal_target_date');
 	expect($inner)->not->toHaveKey('goal_needs_whole_amount');
+	expect($inner)->not->toHaveKey('goal_frequency');
+});
+
+it('CreateCategoryRequest toArray() serializes goalFrequency to its string value', function () {
+	$request = new CreateCategoryRequest(
+		name: 'Groceries',
+		categoryGroupId: 'CG1',
+		goalTarget: 30000,
+		goalFrequency: GoalFrequency::Monthly,
+	);
+
+	$inner = $request->toArray()['category'];
+
+	expect($inner['goal_frequency'])->toBe('monthly');
 });
 
 // ---------------------------------------------------------------------------
